@@ -9,7 +9,9 @@
             --primary: #6366f1;
             --primary-hover: #4f46e5;
             --success: #10b981;
+            --success-hover: #059669;
             --danger: #ef4444;
+            --danger-hover: #dc2626;
             --bg: #f8fafc;
             --text: #1e293b;
             --card-bg: #ffffff;
@@ -97,10 +99,18 @@
         
         .btn-danger {
             background-color: var(--danger);
+        }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+        .btn-success:hover { background-color: var(--success-hover); }
+
+        .btn-small {
             padding: 0.4rem 0.8rem;
             font-size: 0.8rem;
         }
-        .btn-danger:hover { background-color: #dc2626; }
 
         /* Barre de progression */
         .progress-section {
@@ -113,8 +123,14 @@
         .stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             font-weight: bold;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-remaining {
+            color: var(--danger);
         }
 
         .progress-bar-bg {
@@ -173,6 +189,14 @@
             animation: bounce 1s infinite;
         }
 
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
@@ -206,7 +230,8 @@
 
         <div class="progress-section">
             <div class="stats">
-                <span id="totalText">Total : 0 €</span>
+                <span id="totalText">Total : 0.00 €</span>
+                <span id="remainingText" class="stat-remaining">Restant : 0.00 €</span>
                 <span id="goalText">Objectif : Non défini</span>
             </div>
             <div class="progress-bar-bg">
@@ -227,12 +252,58 @@
             <tbody id="tableBody">
                 </tbody>
         </table>
+
+        <div class="footer-actions">
+            <button class="btn-success" onclick="saveData()">💾 Sauvegarder</button>
+            <button class="btn-danger" onclick="clearData()">🗑️ Tout effacer</button>
+        </div>
     </div>
 
     <script>
         let goal = 0;
         let total = 0;
         let entries = [];
+
+        // --- NOUVEAU : Chargement des données au lancement de la page ---
+        window.onload = function() {
+            const savedData = localStorage.getItem('monSuiviObjectif');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                goal = data.goal || 0;
+                total = data.total || 0;
+                entries = data.entries || [];
+                
+                if(goal > 0) {
+                    document.getElementById('goalInput').value = goal;
+                    document.getElementById('goalText').innerText = `Objectif : ${goal.toFixed(2)} €`;
+                }
+                updateUI();
+            }
+        };
+
+        // --- NOUVEAU : Fonction de sauvegarde ---
+        function saveData() {
+            const data = {
+                goal: goal,
+                total: total,
+                entries: entries
+            };
+            localStorage.setItem('monSuiviObjectif', JSON.stringify(data));
+            alert("💾 Vos données ont été sauvegardées avec succès dans votre navigateur !");
+        }
+
+        // --- NOUVEAU : Fonction pour tout effacer ---
+        function clearData() {
+            if(confirm("Êtes-vous sûr de vouloir tout effacer ? Cette action est irréversible.")) {
+                goal = 0;
+                total = 0;
+                entries = [];
+                localStorage.removeItem('monSuiviObjectif');
+                document.getElementById('goalInput').value = '';
+                document.getElementById('goalText').innerText = `Objectif : Non défini`;
+                updateUI();
+            }
+        }
 
         function setGoal() {
             const goalInput = document.getElementById('goalInput').value;
@@ -283,6 +354,14 @@
             // Mettre à jour le texte du total
             document.getElementById('totalText').innerText = `Total : ${total.toFixed(2)} €`;
 
+            // --- NOUVEAU : Calcul du reste à payer ---
+            let remaining = 0;
+            if (goal > 0) {
+                remaining = goal - total;
+                if (remaining < 0) remaining = 0; // On ne montre pas un reste négatif si on dépasse
+            }
+            document.getElementById('remainingText').innerText = `Restant : ${remaining.toFixed(2)} €`;
+
             // Calculer le pourcentage
             let percentage = 0;
             if (goal > 0) {
@@ -301,9 +380,12 @@
             if (percentage >= 100 && goal > 0) {
                 progressBar.classList.add('success');
                 document.getElementById('celebration').style.display = 'block';
+                document.getElementById('remainingText').style.color = 'var(--success)';
+                document.getElementById('remainingText').innerText = `Objectif atteint !`;
             } else {
                 progressBar.classList.remove('success');
                 document.getElementById('celebration').style.display = 'none';
+                document.getElementById('remainingText').style.color = 'var(--danger)';
             }
 
             // Mettre à jour le tableau
@@ -315,7 +397,7 @@
                 tr.innerHTML = `
                     <td>${entry.desc}</td>
                     <td class="amount-col">+ ${entry.amount.toFixed(2)} €</td>
-                    <td><button class="btn-danger" onclick="removeAmount(${entry.id})">X</button></td>
+                    <td><button class="btn-danger btn-small" onclick="removeAmount(${entry.id})">X</button></td>
                 `;
                 tbody.appendChild(tr);
             });
