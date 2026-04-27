@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi d'Objectif Financier</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #64748b;
+        }
+
+        input {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .btn-danger:hover { background-color: #dc2626; }
+
+        /* Barre de progression */
+        .progress-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f1f5f9;
+            border-radius: 12px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-bg {
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .progress-bar-fill.success {
+            background: linear-gradient(90deg, var(--success), #34d399);
+        }
+
+        /* Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        
+        .amount-col { font-weight: bold; color: var(--primary); }
+        
+        .celebration {
+            text-align: center;
+            color: var(--success);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            display: none;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🚀 Suivi d'Objectif</h2>
+
+        <div class="input-group">
+            <div class="input-wrapper">
+                <label for="goalInput">Mon objectif à atteindre (€)</label>
+                <input type="number" id="goalInput" placeholder="Ex: 1000" min="1">
+            </div>
+            <button onclick="setGoal()">Définir</button>
+        </div>
+
+        <div class="input-group" style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+            <div class="input-wrapper">
+                <label for="descInput">Description (optionnel)</label>
+                <input type="text" id="descInput" placeholder="Ex: Économies du mois">
+            </div>
+            <div class="input-wrapper" style="flex: 0.5;">
+                <label for="amountInput">Montant (€)</label>
+                <input type="number" id="amountInput" placeholder="Ex: 50" min="0.1" step="0.1">
+            </div>
+            <button onclick="addAmount()">Ajouter</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="stats">
+                <span id="totalText">Total : 0 €</span>
+                <span id="goalText">Objectif : Non défini</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div style="text-align: right; font-size: 0.85rem; margin-top: 0.3rem; font-weight: bold;" id="percentText">0%</div>
+            <div class="celebration" id="celebration">🎉 Objectif Atteint ! Bravo ! 🎉</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Montant</th>
+                    <th style="width: 50px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        let goal = 0;
+        let total = 0;
+        let entries = [];
+
+        function setGoal() {
+            const goalInput = document.getElementById('goalInput').value;
+            if (goalInput && goalInput > 0) {
+                goal = parseFloat(goalInput);
+                document.getElementById('goalText').innerText = `Objectif : ${goal.toFixed(2)} €`;
+                updateUI();
+            } else {
+                alert("Veuillez entrer un objectif valide.");
+            }
+        }
+
+        function addAmount() {
+            if (goal === 0) {
+                alert("Veuillez d'abord définir un objectif !");
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            let desc = document.getElementById('descInput').value;
+            
+            if (!desc) desc = "Ajout";
+
+            if (amount && amount > 0) {
+                entries.push({ id: Date.now(), desc: desc, amount: amount });
+                total += amount;
+                
+                // Réinitialiser les champs
+                document.getElementById('amountInput').value = '';
+                document.getElementById('descInput').value = '';
+                
+                updateUI();
+            } else {
+                alert("Veuillez entrer un montant valide.");
+            }
+        }
+
+        function removeAmount(id) {
+            const index = entries.findIndex(entry => entry.id === id);
+            if (index !== -1) {
+                total -= entries[index].amount;
+                entries.splice(index, 1);
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            // Mettre à jour le texte du total
+            document.getElementById('totalText').innerText = `Total : ${total.toFixed(2)} €`;
+
+            // Calculer le pourcentage
+            let percentage = 0;
+            if (goal > 0) {
+                percentage = (total / goal) * 100;
+            }
+            
+            // Limiter l'affichage à 100% pour la barre
+            let barWidth = percentage > 100 ? 100 : percentage;
+
+            // Mettre à jour la barre de progression
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = `${barWidth}%`;
+            document.getElementById('percentText').innerText = `${percentage.toFixed(1)}%`;
+
+            // Effet visuel si objectif atteint
+            if (percentage >= 100 && goal > 0) {
+                progressBar.classList.add('success');
+                document.getElementById('celebration').style.display = 'block';
+            } else {
+                progressBar.classList.remove('success');
+                document.getElementById('celebration').style.display = 'none';
+            }
+
+            // Mettre à jour le tableau
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = ''; // Vider le tableau
+            
+            entries.forEach(entry => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${entry.desc}</td>
+                    <td class="amount-col">+ ${entry.amount.toFixed(2)} €</td>
+                    <td><button class="btn-danger" onclick="removeAmount(${entry.id})">X</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
