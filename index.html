@@ -1,1429 +1,168 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COVO PRO — Catalogue Animé</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --noir: #0a0a0a;
-  --blanc: #f5f2ec;
-  --accent: #e63329;
-  --gris: #c8c4bc;
-  --gris-clair: #e8e4dc;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--blanc);
-  color: var(--noir);
-  font-family: 'DM Sans', sans-serif;
-  overflow-x: hidden;
-  cursor: none;
-}
-
-/* ── CURSEUR CUSTOM ── */
-.cursor {
-  width: 12px; height: 12px;
-  background: var(--accent);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: transform 0.15s ease;
-  mix-blend-mode: multiply;
-}
-.cursor-ring {
-  width: 40px; height: 40px;
-  border: 1px solid var(--noir);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transition: all 0.3s ease;
-}
-
-/* ── LOADER ── */
-#loader {
-  position: fixed; inset: 0;
-  background: var(--noir);
-  z-index: 9000;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  gap: 20px;
-}
-#loader .logo-load {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 10vw, 96px);
-  color: var(--blanc);
-  letter-spacing: 0.1em;
-  opacity: 0;
-  animation: fadeInUp 0.6s 0.3s forwards;
-}
-#loader .bar-wrap {
-  width: 200px; height: 2px;
-  background: rgba(255,255,255,0.2);
-  overflow: hidden;
-  opacity: 0;
-  animation: fadeInUp 0.6s 0.5s forwards;
-}
-#loader .bar-fill {
-  height: 100%;
-  background: var(--accent);
-  width: 0;
-  animation: loadBar 1.2s 0.7s ease forwards;
-}
-@keyframes loadBar { to { width: 100%; } }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 40px;
-  mix-blend-mode: multiply;
-}
-.nav-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.15em;
-  color: var(--noir);
-}
-.nav-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--gris);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-/* ── PROGRESS BAR ── */
-#progress {
-  position: fixed; top: 0; left: 0;
-  height: 2px;
-  background: var(--accent);
-  z-index: 200;
-  width: 0%;
-  transition: width 0.1s linear;
-}
-
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr;
-  position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--gris);
-}
-.hero-side {
-  display: flex; align-items: center; justify-content: center;
-  border-right: 1px solid var(--gris);
-  padding: 20px 0;
-}
-.hero-side span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gris);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.hero-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 120px 40px 60px;
-  border-right: 1px solid var(--gris);
-}
-.hero-eyebrow {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 24px;
-  opacity: 0;
-  animation: fadeInUp 0.7s 1.8s forwards;
-}
-.hero-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(60px, 8vw, 130px);
-  line-height: 0.92;
-  letter-spacing: -0.01em;
-  opacity: 0;
-  animation: fadeInUp 0.8s 2s forwards;
-}
-.hero-title em {
-  font-style: normal;
-  color: var(--accent);
-  display: block;
-}
-.hero-sub {
-  margin-top: 32px;
-  font-size: 14px;
-  font-weight: 300;
-  color: #555;
-  line-height: 1.7;
-  max-width: 340px;
-  opacity: 0;
-  animation: fadeInUp 0.7s 2.2s forwards;
-}
-.hero-count {
-  margin-top: 40px;
-  display: flex; gap: 32px;
-  opacity: 0;
-  animation: fadeInUp 0.7s 2.4s forwards;
-}
-.hero-count div {
-  display: flex; flex-direction: column; gap: 4px;
-}
-.hero-count .num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px;
-  color: var(--accent);
-  line-height: 1;
-}
-.hero-count .lbl {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gris);
-  font-family: 'Space Mono', monospace;
-}
-.hero-visual {
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-  overflow: hidden;
-  background: var(--gris-clair);
-  opacity: 0;
-  animation: fadeIn 1s 2.2s forwards;
-}
-@keyframes fadeIn { to { opacity: 1; } }
-
-.hero-visual::before {
-  content: '';
-  position: absolute;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(230,51,41,0.12), transparent 70%);
-  animation: pulse 4s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-/* SVG produit hero */
-.product-hero-svg {
-  animation: floatHero 5s ease-in-out infinite;
-  filter: drop-shadow(0 30px 40px rgba(0,0,0,0.15));
-  width: 260px;
-}
-@keyframes floatHero {
-  0%, 100% { transform: translateY(0) rotate(-4deg); }
-  50%       { transform: translateY(-24px) rotate(4deg); }
-}
-
-/* ── MARQUEE ── */
-.marquee-wrap {
-  overflow: hidden;
-  border-top: 1px solid var(--gris);
-  border-bottom: 1px solid var(--gris);
-  padding: 14px 0;
-  background: var(--noir);
-}
-.marquee-track {
-  display: flex;
-  gap: 0;
-  animation: marquee 18s linear infinite;
-  white-space: nowrap;
-}
-.marquee-item {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 0.15em;
-  color: var(--blanc);
-  padding: 0 40px;
-  display: flex; align-items: center; gap: 20px;
-}
-.marquee-item::after {
-  content: '✦';
-  color: var(--accent);
-  font-size: 12px;
-}
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* ── SECTION PRODUITS ── */
-.section-produits {
-  padding: 80px 0;
-}
-.section-header {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  border-bottom: 1px solid var(--gris);
-  margin-bottom: 0;
-}
-.section-num {
-  display: flex; align-items: center; justify-content: center;
-  border-right: 1px solid var(--gris);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--gris);
-  letter-spacing: 0.2em;
-  padding: 20px;
-}
-.section-label {
-  padding: 20px 40px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.section-label h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(32px, 5vw, 64px);
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-.section-label .tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gris);
-  border: 1px solid var(--gris);
-  padding: 6px 14px;
-}
-
-/* ── GRILLE PRODUITS ── */
-.produits-grid {
-  display: grid;
-  grid-template-columns: 80px repeat(3, 1fr);
-}
-.grid-side {
-  border-right: 1px solid var(--gris);
-  display: flex; align-items: flex-start;
-  padding-top: 40px;
-  justify-content: center;
-}
-.grid-side span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gris);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.produits-cols {
-  grid-column: 2 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* ── CARTE PRODUIT ── */
-.prod-card {
-  border-right: 1px solid var(--gris);
-  border-bottom: 1px solid var(--gris);
-  overflow: hidden;
-  cursor: none;
-  position: relative;
-
-  /* ANIMATION SCROLL */
-  opacity: 0;
-  transform: translateY(60px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.prod-card:last-child { border-right: none; }
-.prod-card.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.prod-card:nth-child(2) { transition-delay: 0.1s; }
-.prod-card:nth-child(3) { transition-delay: 0.2s; }
-
-.prod-card-img {
-  height: 260px;
-  background: var(--gris-clair);
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.4s;
-}
-.prod-card:hover .prod-card-img { background: #dedad2; }
-
-.prod-card-img svg {
-  width: 140px;
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  filter: drop-shadow(0 16px 24px rgba(0,0,0,0.12));
-}
-.prod-card:hover .prod-card-img svg {
-  transform: translateY(-12px) rotate(5deg) scale(1.05);
-}
-
-.prod-float {
-  animation: floatCard 4s ease-in-out infinite;
-}
-.prod-card:nth-child(2) .prod-float { animation-delay: -1.3s; }
-.prod-card:nth-child(3) .prod-float { animation-delay: -2.6s; }
-
-@keyframes floatCard {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-10px); }
-}
-
-.prod-card-info {
-  padding: 24px;
-  border-top: 1px solid var(--gris);
-}
-.prod-card-cat {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 8px;
-}
-.prod-card-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
-  letter-spacing: 0.04em;
-  line-height: 1.1;
-  margin-bottom: 8px;
-}
-.prod-card-desc {
-  font-size: 12px;
-  font-weight: 300;
-  color: #777;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.prod-card-bottom {
-  display: flex; align-items: center; justify-content: space-between;
-}
-.prod-prix {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  color: var(--accent);
-}
-.prod-stock {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gris);
-}
-.prod-stock.ok { color: #2d8f5a; }
-.prod-stock.bas { color: #e6a229; }
-
-.prod-add {
-  width: 36px; height: 36px;
-  border: 1px solid var(--noir);
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  cursor: none;
-  transition: all 0.25s;
-  font-size: 18px;
-  font-weight: 300;
-}
-.prod-add:hover {
-  background: var(--noir);
-  color: var(--blanc);
-}
-
-/* ── SECTION HIGHLIGHT (grande carte) ── */
-.highlight-section {
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr;
-  border-top: 1px solid var(--gris);
-  border-bottom: 1px solid var(--gris);
-  min-height: 500px;
-}
-.highlight-left {
-  border-right: 1px solid var(--gris);
-  display: flex; align-items: center; justify-content: center;
-}
-.highlight-left span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gris);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.highlight-text {
-  padding: 60px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-right: 1px solid var(--gris);
-
-  /* SCROLL ANIMATION */
-  opacity: 0;
-  transform: translateX(-40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.highlight-text.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-.hl-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 20px;
-}
-.hl-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 6vw, 90px);
-  line-height: 0.9;
-  letter-spacing: 0.02em;
-  margin-bottom: 24px;
-}
-.hl-desc {
-  font-size: 14px;
-  font-weight: 300;
-  color: #555;
-  line-height: 1.8;
-  max-width: 380px;
-  margin-bottom: 32px;
-}
-.hl-tags {
-  display: flex; gap: 10px; flex-wrap: wrap;
-}
-.hl-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  border: 1px solid var(--gris);
-  padding: 6px 14px;
-  color: #555;
-}
-.highlight-visual {
-  background: var(--noir);
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-  overflow: hidden;
-
-  opacity: 0;
-  transform: translateX(40px);
-  transition: opacity 0.8s 0.2s ease, transform 0.8s 0.2s ease;
-}
-.highlight-visual.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-.highlight-visual::before {
-  content: '';
-  position: absolute;
-  width: 400px; height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(230,51,41,0.2), transparent 65%);
-  animation: pulse 5s ease-in-out infinite;
-}
-.highlight-visual svg {
-  width: 200px;
-  filter: drop-shadow(0 20px 40px rgba(230,51,41,0.3));
-  animation: floatHero 6s ease-in-out infinite;
-  position: relative;
-  z-index: 2;
-}
-
-/* ── STATS BAND ── */
-.stats-band {
-  display: grid;
-  grid-template-columns: 80px repeat(4, 1fr);
-  border-bottom: 1px solid var(--gris);
-}
-.stats-side {
-  border-right: 1px solid var(--gris);
-  display: flex; align-items: center; justify-content: center;
-}
-.stats-side span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gris);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.stat-item {
-  padding: 40px 30px;
-  border-right: 1px solid var(--gris);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.stat-item:last-child { border-right: none; }
-.stat-item.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.stat-item:nth-child(2) { transition-delay: 0.1s; }
-.stat-item:nth-child(3) { transition-delay: 0.2s; }
-.stat-item:nth-child(4) { transition-delay: 0.3s; }
-.stat-item:nth-child(5) { transition-delay: 0.4s; }
-
-.stat-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(40px, 5vw, 72px);
-  color: var(--accent);
-  line-height: 1;
-}
-.stat-lbl {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gris);
-}
-
-/* ── SECTION GRILLE 2 ── */
-.section-wide {
-  display: grid;
-  grid-template-columns: 80px 2fr 1fr;
-  border-bottom: 1px solid var(--gris);
-  min-height: 420px;
-}
-.sw-side {
-  border-right: 1px solid var(--gris);
-  display: flex; align-items: center; justify-content: center;
-}
-.sw-side span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gris);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.sw-main {
-  border-right: 1px solid var(--gris);
-  padding: 50px 40px;
-  display: flex; align-items: center;
-  gap: 40px;
-
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.sw-main.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.sw-big-text {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(60px, 8vw, 120px);
-  line-height: 0.88;
-  letter-spacing: 0.02em;
-  flex: 1;
-}
-.sw-big-text span { color: var(--accent); }
-.sw-desc-block {
-  flex: 0 0 260px;
-  display: flex; flex-direction: column; gap: 16px;
-}
-.sw-desc-block p {
-  font-size: 13px;
-  font-weight: 300;
-  color: #666;
-  line-height: 1.8;
-}
-.sw-btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  padding: 14px 24px;
-  border: 1px solid var(--noir);
-  background: transparent;
-  cursor: none;
-  transition: all 0.25s;
-  color: var(--noir);
-  text-decoration: none;
-}
-.sw-btn:hover {
-  background: var(--noir);
-  color: var(--blanc);
-}
-.sw-sidebar {
-  padding: 40px 30px;
-  display: flex; flex-direction: column; gap: 20px;
-
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.8s 0.3s ease, transform 0.8s 0.3s ease;
-}
-.sw-sidebar.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-.sw-sidebar-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  letter-spacing: 0.08em;
-  border-bottom: 1px solid var(--gris);
-  padding-bottom: 14px;
-}
-.sw-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--gris-clair);
-}
-.sw-item-name {
-  font-size: 12px;
-  font-weight: 400;
-}
-.sw-item-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--accent);
-}
-
-/* ── MARQUEE 2 ── */
-.marquee-wrap.light {
-  background: var(--gris-clair);
-}
-.marquee-wrap.light .marquee-item {
-  color: var(--noir);
-}
-.marquee-wrap.light .marquee-item::after {
-  color: var(--accent);
-}
-.marquee-track.reverse {
-  animation-direction: reverse;
-  animation-duration: 22s;
-}
-
-/* ── FOOTER ── */
-footer {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  border-top: 1px solid var(--gris);
-  background: var(--noir);
-}
-.footer-side {
-  border-right: 1px solid rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-}
-.footer-side span {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.footer-content {
-  padding: 60px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-.footer-big {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 8vw, 110px);
-  color: var(--blanc);
-  line-height: 0.9;
-  letter-spacing: 0.02em;
-
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.footer-big.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.footer-big span { color: var(--accent); }
-.footer-bottom {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 40px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-.footer-copy {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-}
-.footer-badge {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 14px;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-}
-
-/* ── SCROLL REVEAL GLOBAL ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── HOVER CURSOR EFFECT ── */
-a, button, .prod-card { cursor: none; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .hero { grid-template-columns: 40px 1fr; }
-  .hero-visual { display: none; }
-  .produits-grid { grid-template-columns: 40px 1fr; }
-  .produits-cols { grid-template-columns: 1fr; }
-  .highlight-section { grid-template-columns: 40px 1fr; }
-  .highlight-visual { display: none; }
-  .stats-band { grid-template-columns: 40px repeat(2, 1fr); }
-  .section-wide { grid-template-columns: 40px 1fr; }
-  .sw-sidebar { display: none; }
-  nav { padding: 16px 20px; }
-  .hero-side { display: none; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marées Mayotte</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .selectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .selector-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+        select {
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+            color: #333;
+        }
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+        }
+        .tides-result {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .tide-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+        .tide-type {
+            font-weight: 600;
+            color: #764ba2;
+        }
+        .tide-time {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .tide-height {
+            color: #888;
+            font-size: 13px;
+        }
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
-<!-- PROGRESS -->
-<div id="progress"></div>
-
-<!-- LOADER -->
-<div id="loader">
-  <div class="logo-load">COVO PRO</div>
-  <div class="bar-wrap"><div class="bar-fill"></div></div>
-</div>
-
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">COVO PRO</div>
-  <div class="nav-tag">Catalogue v2.6 — 2026</div>
-</nav>
-
-<!-- ════════════════ HERO ════════════════ -->
-<section class="hero">
-  <div class="hero-side"><span>COVO PRO — GESTION STOCK</span></div>
-
-  <div class="hero-text">
-    <div class="hero-eyebrow">✦ Catalogue Animé — Demo</div>
-    <h1 class="hero-title">
-      GESTION
-      <em>PRODUITS</em>
-      PRO
-    </h1>
-    <p class="hero-sub">
-      Visualisez votre inventaire avec des animations fluides au défilement.
-      Chaque produit prend vie quand vous scrollez.
-    </p>
-    <div class="hero-count">
-      <div>
-        <div class="num">248</div>
-        <div class="lbl">Produits</div>
-      </div>
-      <div>
-        <div class="num">12</div>
-        <div class="lbl">Catégories</div>
-      </div>
-      <div>
-        <div class="num">94%</div>
-        <div class="lbl">Stock OK</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="hero-visual">
-    <!-- PRODUIT HERO SVG : boîte de conserve stylisée -->
-    <svg class="product-hero-svg" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Corps principal -->
-      <rect x="30" y="60" width="140" height="180" rx="16" fill="#1a1a1a"/>
-      <!-- Reflet gauche -->
-      <rect x="30" y="60" width="20" height="180" rx="16" fill="#2a2a2a"/>
-      <!-- Étiquette -->
-      <rect x="42" y="100" width="116" height="90" rx="6" fill="#f5f2ec"/>
-      <!-- Logo COVO sur l'étiquette -->
-      <text x="100" y="136" font-family="Arial Black" font-size="18" font-weight="900" text-anchor="middle" fill="#0a0a0a">COVO</text>
-      <text x="100" y="154" font-family="Arial" font-size="8" text-anchor="middle" fill="#555" letter-spacing="4">PREMIUM</text>
-      <!-- Ligne décorative -->
-      <rect x="55" y="162" width="90" height="1" fill="#e63329"/>
-      <!-- Petit texte -->
-      <text x="100" y="178" font-family="Arial" font-size="7" text-anchor="middle" fill="#aaa" letter-spacing="2">500 ML — QUALITÉ SUP.</text>
-      <!-- Couvercle top -->
-      <ellipse cx="100" cy="60" rx="70" ry="18" fill="#2d2d2d"/>
-      <ellipse cx="100" cy="60" rx="52" ry="12" fill="#222"/>
-      <!-- Anneau d'ouverture -->
-      <ellipse cx="115" cy="55" rx="12" ry="5" fill="#444"/>
-      <path d="M127 55 C135 48 138 46 136 50" stroke="#666" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <!-- Fond -->
-      <ellipse cx="100" cy="240" rx="70" ry="18" fill="#222"/>
-      <!-- Reflet lumineux sur le corps -->
-      <rect x="148" y="80" width="8" height="140" rx="4" fill="rgba(255,255,255,0.06)"/>
-    </svg>
-  </div>
-</section>
-
-<!-- ════════════════ MARQUEE 1 ════════════════ -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <!-- Double pour seamless -->
-    <div class="marquee-item">STOCK EN TEMPS RÉEL</div>
-    <div class="marquee-item">ANIMATIONS SCROLL</div>
-    <div class="marquee-item">CATALOGUE VIVANT</div>
-    <div class="marquee-item">GESTION PRODUITS</div>
-    <div class="marquee-item">COVO PRO 2026</div>
-    <div class="marquee-item">INVENTAIRE INTELLIGENT</div>
-    <div class="marquee-item">STOCK EN TEMPS RÉEL</div>
-    <div class="marquee-item">ANIMATIONS SCROLL</div>
-    <div class="marquee-item">CATALOGUE VIVANT</div>
-    <div class="marquee-item">GESTION PRODUITS</div>
-    <div class="marquee-item">COVO PRO 2026</div>
-    <div class="marquee-item">INVENTAIRE INTELLIGENT</div>
-  </div>
-</div>
-
-<!-- ════════════════ SECTION 01 — CATALOGUE ════════════════ -->
-<section class="section-produits">
-  <div class="section-header">
-    <div class="section-num">#01</div>
-    <div class="section-label">
-      <h2>CATALOGUE PRODUITS</h2>
-      <span class="tag">Scroll pour animer</span>
-    </div>
-  </div>
-
-  <div class="produits-grid">
-    <div class="grid-side"><span>BOISSONS & ÉPICERIE</span></div>
-    <div class="produits-cols">
-
-      <!-- CARTE 1 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Bouteille eau -->
-            <rect x="42" y="50" width="56" height="130" rx="12" fill="#d4eeff"/>
-            <rect x="42" y="50" width="10" height="130" rx="12" fill="#c0e4ff"/>
-            <rect x="52" y="85" width="36" height="55" rx="4" fill="white" opacity="0.9"/>
-            <text x="70" y="108" font-family="Arial Black" font-size="9" text-anchor="middle" fill="#0077bb">AQUA</text>
-            <text x="70" y="120" font-family="Arial" font-size="6" text-anchor="middle" fill="#0077bb" letter-spacing="2">PURE</text>
-            <rect x="50" y="35" width="40" height="20" rx="8" fill="#a8d4f0"/>
-            <rect x="58" y="28" width="24" height="14" rx="6" fill="#90c4e0"/>
-            <ellipse cx="70" cy="180" rx="28" ry="8" fill="#b8deff" opacity="0.5"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Boissons</div>
-          <div class="prod-card-name">Eau Minérale Aqua</div>
-          <div class="prod-card-desc">500ml · Eau de source naturelle, minéraux essentiels</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">350 F</div>
-              <div class="prod-stock ok">✓ 142 en stock</div>
+    <div class="container">
+        <h1>🌊 Marées Mayotte</h1>
+        
+        <div class="selectors">
+            <div class="selector-group">
+                <label for="ville">Ville</label>
+                <select id="ville">
+                    <option value="dzaoudzi">Dzaoudzi</option>
+                    <option value="mamoudzou">Mamoudzou</option>
+                    <option value="koungou">Koungou</option>
+                    <option value="sada">Sada</option>
+                </select>
             </div>
-            <button class="prod-add">+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARTE 2 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Boîte céréales -->
-            <rect x="28" y="40" width="84" height="130" rx="6" fill="#e8571e"/>
-            <rect x="28" y="40" width="14" height="130" rx="6" fill="#c94418"/>
-            <rect x="38" y="60" width="64" height="80" rx="4" fill="#fff8f0"/>
-            <text x="70" y="92" font-family="Arial Black" font-size="10" text-anchor="middle" fill="#e8571e">CEREAL</text>
-            <text x="70" y="106" font-family="Arial Black" font-size="8" text-anchor="middle" fill="#333">GOLD</text>
-            <rect x="42" y="115" width="56" height="1" fill="#e8571e"/>
-            <text x="70" y="128" font-family="Arial" font-size="6" text-anchor="middle" fill="#888" letter-spacing="1">500g — ENRICHI</text>
-            <rect x="28" y="40" width="84" height="14" rx="6" fill="#f4763a"/>
-            <text x="70" y="52" font-family="Arial Black" font-size="7" text-anchor="middle" fill="white">COVO STORE</text>
-            <ellipse cx="70" cy="170" rx="30" ry="7" fill="#e8571e" opacity="0.2"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Épicerie</div>
-          <div class="prod-card-name">Céréales Gold 500g</div>
-          <div class="prod-card-desc">Enrichi en vitamines, idéal pour le petit-déjeuner</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">1 200 F</div>
-              <div class="prod-stock bas">⚠ 8 en stock</div>
+            <div class="selector-group">
+                <label for="jour">Jour</label>
+                <select id="jour">
+                    <option value="21">21 juin</option>
+                    <option value="22">22 juin</option>
+                    <option value="23">23 juin</option>
+                    <option value="24">24 juin</option>
+                    <option value="25">25 juin</option>
+                    <option value="26">26 juin</option>
+                    <option value="27">27 juin</option>
+                </select>
             </div>
-            <button class="prod-add">+</button>
-          </div>
         </div>
-      </div>
 
-      <!-- CARTE 3 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Canette soda -->
-            <rect x="40" y="55" width="60" height="110" rx="10" fill="#1a1a2e"/>
-            <rect x="40" y="55" width="10" height="110" rx="10" fill="#141428"/>
-            <!-- Dégradé rouge sur canette -->
-            <rect x="50" y="75" width="40" height="70" fill="#e63329" opacity="0.9"/>
-            <text x="70" y="108" font-family="Arial Black" font-size="12" text-anchor="middle" fill="white">SPARK</text>
-            <text x="70" y="122" font-family="Arial" font-size="6" text-anchor="middle" fill="rgba(255,255,255,0.6)" letter-spacing="3">ENERGY</text>
-            <!-- Top canette -->
-            <ellipse cx="70" cy="55" rx="30" ry="10" fill="#2d2d4e"/>
-            <ellipse cx="70" cy="55" rx="22" ry="7" fill="#222240"/>
-            <ellipse cx="80" cy="52" rx="8" ry="3" fill="#3d3d5e"/>
-            <path d="M88 52 C94 47 96 46 94 50" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <!-- Bottom -->
-            <ellipse cx="70" cy="165" rx="30" ry="10" fill="#141428"/>
-            <ellipse cx="70" cy="175" rx="26" ry="7" fill="#0f0f20"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Boissons</div>
-          <div class="prod-card-name">Spark Energy 250ml</div>
-          <div class="prod-card-desc">Boisson énergisante premium, saveur originale</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">600 F</div>
-              <div class="prod-stock ok">✓ 76 en stock</div>
-            </div>
-            <button class="prod-add">+</button>
-          </div>
-        </div>
-      </div>
-
+        <div class="tides-result" id="tidesResult"></div>
+        <div class="info-box">Données officielles SHOM • Heure locale Mayotte (UTC+3)</div>
     </div>
-  </div>
 
-  <!-- Ligne 2 -->
-  <div class="produits-grid" style="margin-top:0; border-top:1px solid var(--gris);">
-    <div class="grid-side"><span>HYGIÈNE & SOINS</span></div>
-    <div class="produits-cols">
-
-      <!-- CARTE 4 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Tube dentifrice -->
-            <rect x="30" y="80" width="80" height="40" rx="20" fill="#f0f0ff" transform="rotate(-25 70 100)"/>
-            <rect x="30" y="80" width="80" height="40" rx="20" fill="none" stroke="#ddd" stroke-width="1" transform="rotate(-25 70 100)"/>
-            <!-- Corps -->
-            <rect x="35" y="70" width="70" height="38" rx="10" fill="#4488ff" transform="rotate(-25 70 90)"/>
-            <text x="70" y="105" font-family="Arial Black" font-size="8" text-anchor="middle" fill="white" transform="rotate(-25 70 105)">FRESH MAX</text>
-            <!-- Bouchon -->
-            <rect x="100" y="58" width="22" height="14" rx="6" fill="#fff" transform="rotate(-25 111 65)"/>
-            <!-- Dentifrice qui sort -->
-            <path d="M32 125 Q40 118 45 122 Q50 126 42 132 Z" fill="white" stroke="#eee" stroke-width="0.5"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Hygiène</div>
-          <div class="prod-card-name">Dentifrice Fresh Max</div>
-          <div class="prod-card-desc">100ml · Blancheur intense, haleine fraîche 12h</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">850 F</div>
-              <div class="prod-stock ok">✓ 55 en stock</div>
-            </div>
-            <button class="prod-add">+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARTE 5 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Flacon lotion -->
-            <rect x="45" y="55" width="50" height="120" rx="20" fill="#f5e6d3"/>
-            <rect x="45" y="55" width="10" height="120" rx="20" fill="#eedcc8"/>
-            <!-- Pompe -->
-            <rect x="62" y="30" width="16" height="30" rx="6" fill="#c8a882"/>
-            <ellipse cx="70" cy="28" rx="10" ry="6" fill="#b89470"/>
-            <rect x="64" y="20" width="12" height="16" rx="6" fill="#d4b090"/>
-            <!-- Étiquette -->
-            <rect x="52" y="90" width="36" height="50" rx="4" fill="white" opacity="0.8"/>
-            <text x="70" y="112" font-family="Arial Black" font-size="7" text-anchor="middle" fill="#8b6540">VELVET</text>
-            <text x="70" y="124" font-family="Arial" font-size="6" text-anchor="middle" fill="#b89470" letter-spacing="2">SOFT</text>
-            <rect x="58" y="128" width="24" height="1" fill="#c8a882"/>
-            <!-- Ombre bas -->
-            <ellipse cx="70" cy="175" rx="28" ry="7" fill="#e8d4c0" opacity="0.4"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Soins</div>
-          <div class="prod-card-name">Lotion Velvet Soft</div>
-          <div class="prod-card-desc">200ml · Formule hydratante 24h, sans parfum</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">1 500 F</div>
-              <div class="prod-stock ok">✓ 31 en stock</div>
-            </div>
-            <button class="prod-add">+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARTE 6 -->
-      <div class="prod-card">
-        <div class="prod-card-img">
-          <svg class="prod-float" viewBox="0 0 140 200" fill="none">
-            <!-- Savon emballé -->
-            <rect x="30" y="75" width="80" height="60" rx="10" fill="#ffd4e8"/>
-            <rect x="30" y="75" width="14" height="60" rx="10" fill="#ffc4dc"/>
-            <!-- Emballage -->
-            <rect x="40" y="82" width="60" height="46" rx="4" fill="#fff0f7" opacity="0.9"/>
-            <!-- Ruban déco -->
-            <rect x="30" y="98" width="80" height="8" fill="#ff9fc4" opacity="0.7"/>
-            <text x="70" y="95" font-family="Arial Black" font-size="9" text-anchor="middle" fill="#cc4488">SAVON</text>
-            <text x="70" y="117" font-family="Arial" font-size="6" text-anchor="middle" fill="#cc4488" letter-spacing="2">ROSE</text>
-            <!-- Petites fleurs déco -->
-            <circle cx="50" cy="86" r="3" fill="#ff9fc4"/>
-            <circle cx="90" cy="86" r="3" fill="#ff9fc4"/>
-            <circle cx="50" cy="130" r="3" fill="#ff9fc4"/>
-            <circle cx="90" cy="130" r="3" fill="#ff9fc4"/>
-            <ellipse cx="70" cy="150" rx="30" ry="6" fill="#ffd4e8" opacity="0.3"/>
-          </svg>
-        </div>
-        <div class="prod-card-info">
-          <div class="prod-card-cat">Hygiène</div>
-          <div class="prod-card-name">Savon Rose Premium</div>
-          <div class="prod-card-desc">150g · Surgras, parfum naturel de rose</div>
-          <div class="prod-card-bottom">
-            <div>
-              <div class="prod-prix">450 F</div>
-              <div class="prod-stock bas">⚠ 4 en stock</div>
-            </div>
-            <button class="prod-add">+</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════ MARQUEE 2 ════════════════ -->
-<div class="marquee-wrap light">
-  <div class="marquee-track reverse">
-    <div class="marquee-item">PRIX COMPÉTITIFS</div>
-    <div class="marquee-item">RÉAPPROVISIONNEMENT AUTO</div>
-    <div class="marquee-item">ALERTES STOCK BAS</div>
-    <div class="marquee-item">HISTORIQUE VENTES</div>
-    <div class="marquee-item">FIDÉLITÉ CLIENT</div>
-    <div class="marquee-item">CAISSE RAPIDE</div>
-    <div class="marquee-item">PRIX COMPÉTITIFS</div>
-    <div class="marquee-item">RÉAPPROVISIONNEMENT AUTO</div>
-    <div class="marquee-item">ALERTES STOCK BAS</div>
-    <div class="marquee-item">HISTORIQUE VENTES</div>
-    <div class="marquee-item">FIDÉLITÉ CLIENT</div>
-    <div class="marquee-item">CAISSE RAPIDE</div>
-  </div>
-</div>
-
-<!-- ════════════════ SECTION 02 — HIGHLIGHT ════════════════ -->
-<div class="section-header" style="border-top:1px solid var(--gris);">
-  <div class="section-num">#02</div>
-  <div class="section-label">
-    <h2>PRODUIT VEDETTE</h2>
-    <span class="tag">Animation révélation</span>
-  </div>
-</div>
-
-<section class="highlight-section">
-  <div class="highlight-left"><span>PRODUIT DU MOIS</span></div>
-
-  <div class="highlight-text">
-    <div class="hl-num">✦ Meilleure vente — Mai 2026</div>
-    <h2 class="hl-title">HUILE<br>D'OLIVE<br>EXTRA</h2>
-    <p class="hl-desc">
-      L'huile premium de votre catalogue. Importée directement des producteurs,
-      première pression à froid. Vos clients l'adorent — 89 bouteilles vendues ce mois.
-    </p>
-    <div class="hl-tags">
-      <span class="hl-tag">750ml</span>
-      <span class="hl-tag">Première pression</span>
-      <span class="hl-tag">Extra vierge</span>
-      <span class="hl-tag">2 800 F</span>
-    </div>
-  </div>
-
-  <div class="highlight-visual">
-    <svg viewBox="0 0 200 320" fill="none">
-      <!-- Bouteille d'huile élégante -->
-      <!-- Corps -->
-      <path d="M60 100 Q55 120 52 180 Q50 240 55 280 Q70 300 100 300 Q130 300 145 280 Q150 240 148 180 Q145 120 140 100 Z" fill="#c8a830" opacity="0.95"/>
-      <!-- Reflet gauche -->
-      <path d="M60 100 Q58 120 56 180 Q54 230 58 270 L62 265 Q64 220 66 175 Q68 130 68 105 Z" fill="#e0c048" opacity="0.6"/>
-      <!-- Col -->
-      <path d="M75 80 Q72 90 70 100 L130 100 Q128 90 125 80 Z" fill="#b89628"/>
-      <!-- Goulot -->
-      <rect x="82" y="40" width="36" height="44" rx="8" fill="#c8a830"/>
-      <!-- Bouchon -->
-      <rect x="78" y="26" width="44" height="20" rx="8" fill="#2d2d2d"/>
-      <rect x="83" y="20" width="34" height="14" rx="6" fill="#1a1a1a"/>
-      <!-- Étiquette -->
-      <rect x="62" y="130" width="76" height="100" rx="6" fill="#f8f2e0"/>
-      <!-- Déco olive -->
-      <circle cx="100" cy="152" r="12" fill="#4a7c2a" opacity="0.8"/>
-      <ellipse cx="100" cy="152" rx="8" ry="10" fill="#5a9a34" opacity="0.9"/>
-      <ellipse cx="97" cy="148" rx="3" ry="4" fill="#6db840" opacity="0.7"/>
-      <!-- Texte étiquette -->
-      <text x="100" y="176" font-family="Georgia" font-size="9" font-style="italic" text-anchor="middle" fill="#4a3800">Huile d'Olive</text>
-      <text x="100" y="188" font-family="Arial Black" font-size="10" text-anchor="middle" fill="#1a1a1a">EXTRA</text>
-      <rect x="72" y="194" width="56" height="1" fill="#c8a830"/>
-      <text x="100" y="208" font-family="Arial" font-size="7" text-anchor="middle" fill="#888" letter-spacing="2">750 ML — BIO</text>
-      <!-- Ombre -->
-      <ellipse cx="100" cy="305" rx="50" ry="12" fill="#c8a830" opacity="0.2"/>
-    </svg>
-  </div>
-</section>
-
-<!-- ════════════════ SECTION 03 — STATS ════════════════ -->
-<div class="section-header" style="border-top:1px solid var(--gris);">
-  <div class="section-num">#03</div>
-  <div class="section-label">
-    <h2>TABLEAU DE BORD</h2>
-    <span class="tag">Indicateurs clés</span>
-  </div>
-</div>
-
-<div class="stats-band">
-  <div class="stats-side"><span>PERFORMANCES</span></div>
-  <div class="stat-item">
-    <div class="stat-num">248</div>
-    <div class="stat-lbl">Références actives</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">89K</div>
-    <div class="stat-lbl">CA ce mois (F)</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">14</div>
-    <div class="stat-lbl">Alertes stock</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">97%</div>
-    <div class="stat-lbl">Taux satisfaction</div>
-  </div>
-</div>
-
-<!-- ════════════════ SECTION 04 — TEXTE LARGE ════════════════ -->
-<div class="section-header" style="border-top:1px solid var(--gris);">
-  <div class="section-num">#04</div>
-  <div class="section-label">
-    <h2>RÉAPPROVISIONNEMENT</h2>
-    <span class="tag">Alertes automatiques</span>
-  </div>
-</div>
-
-<section class="section-wide">
-  <div class="sw-side"><span>GESTION INTELLIGENTE</span></div>
-  <div class="sw-main">
-    <div class="sw-big-text">
-      STOCK<br>
-      <span>FAIBLE</span><br>
-      ALERTE
-    </div>
-    <div class="sw-desc-block">
-      <p>
-        COVO Pro surveille votre inventaire en permanence.
-        Dès qu'un produit passe sous le seuil minimum,
-        une alerte est déclenchée automatiquement.
-      </p>
-      <a href="#" class="sw-btn">Voir les alertes →</a>
-    </div>
-  </div>
-  <div class="sw-sidebar">
-    <div class="sw-sidebar-title">Stock critique</div>
-    <div class="sw-item">
-      <span class="sw-item-name">Céréales Gold 500g</span>
-      <span class="sw-item-val">8 u.</span>
-    </div>
-    <div class="sw-item">
-      <span class="sw-item-name">Savon Rose Premium</span>
-      <span class="sw-item-val">4 u.</span>
-    </div>
-    <div class="sw-item">
-      <span class="sw-item-name">Lait concentré 400g</span>
-      <span class="sw-item-val">6 u.</span>
-    </div>
-    <div class="sw-item">
-      <span class="sw-item-name">Sucre cristal 1kg</span>
-      <span class="sw-item-val">11 u.</span>
-    </div>
-    <div class="sw-item">
-      <span class="sw-item-name">Huile tournesol 1L</span>
-      <span class="sw-item-val">3 u.</span>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════ MARQUEE 3 ════════════════ -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <div class="marquee-item">MERCI D'UTILISER COVO PRO</div>
-    <div class="marquee-item">VOTRE COMMERCE SIMPLIFIÉ</div>
-    <div class="marquee-item">GESTION STOCK INTUITIVE</div>
-    <div class="marquee-item">SCROLL ANIMÉ INTÉGRABLE</div>
-    <div class="marquee-item">ALIANDPRO © 2026</div>
-    <div class="marquee-item">MERCI D'UTILISER COVO PRO</div>
-    <div class="marquee-item">VOTRE COMMERCE SIMPLIFIÉ</div>
-    <div class="marquee-item">GESTION STOCK INTUITIVE</div>
-    <div class="marquee-item">SCROLL ANIMÉ INTÉGRABLE</div>
-    <div class="marquee-item">ALIANDPRO © 2026</div>
-  </div>
-</div>
-
-<!-- ════════════════ FOOTER ════════════════ -->
-<footer>
-  <div class="footer-side"><span>COVO PRO — 2026</span></div>
-  <div class="footer-content">
-    <div class="footer-big reveal">
-      PRÊT À<br>
-      INTÉGRER<br>
-      <span>COVO ?</span>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-copy">© 2026 COVO PRO — ALIANDpro — Tous droits réservés</div>
-      <div class="footer-badge">✦ DEMO SCROLL ANIMATIONS</div>
-    </div>
-  </div>
-</footer>
-
-<script>
-/* ── LOADER ── */
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const loader = document.getElementById('loader');
-    loader.style.transition = 'opacity 0.6s ease';
-    loader.style.opacity = '0';
-    setTimeout(() => loader.style.display = 'none', 600);
-  }, 2000);
-});
-
-/* ── CURSOR ── */
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
-});
-
-function animRing() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.transform = `translate(${rx - 20}px, ${ry - 20}px)`;
-  requestAnimationFrame(animRing);
-}
-animRing();
-
-document.querySelectorAll('button, a, .prod-card').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursor.style.transform += ' scale(2)';
-    ring.style.transform += ' scale(1.5)';
-    ring.style.borderColor = 'var(--accent)';
-  });
-  el.addEventListener('mouseleave', () => {
-    ring.style.borderColor = 'var(--noir)';
-  });
-});
-
-/* ── PROGRESS BAR ── */
-const bar = document.getElementById('progress');
-window.addEventListener('scroll', () => {
-  const h = document.documentElement;
-  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-  bar.style.width = pct + '%';
-});
-
-/* ── INTERSECTION OBSERVER ── */
-const animElements = document.querySelectorAll(
-  '.prod-card, .highlight-text, .highlight-visual, .stat-item, .sw-main, .sw-sidebar, .reveal'
-);
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
-}, {
-  threshold: 0.15,
-  rootMargin: '0px 0px -60px 0px'
-});
-
-animElements.forEach(el => observer.observe(el));
-
-/* ── COMPTEUR ANIMÉ ── */
-function animCount(el, target, suffix = '') {
-  let current = 0;
-  const duration = 1800;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    current += step;
-    if (current >= target) {
-      current = target;
-      clearInterval(timer);
-    }
-    el.textContent = Math.floor(current).toLocaleString('fr') + suffix;
-  }, 16);
-}
-
-const statNums = document.querySelectorAll('.stat-num');
-const statObs = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const txt = entry.target.textContent;
-      const num = parseInt(txt.replace(/\D/g, ''));
-      const suffix = txt.replace(/[\d\s]/g, '').replace('K','') + (txt.includes('K') ? 'K' : '') + (txt.includes('%') ? '%' : '');
-      animCount(entry.target, num, suffix);
-      statObs.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.5 });
-
-statNums.forEach(el => statObs.observe(el));
-
-/* ── PARALLAX LÉGER HERO ── */
-window.addEventListener('scroll', () => {
-  const scrollY = window.scrollY;
-  const heroTitle = document.querySelector('.hero-title');
-  if (heroTitle && scrollY < window.innerHeight) {
-    heroTitle.style.transform = `translateY(${scrollY * 0.15}px)`;
-    heroTitle.style.opacity = 1 - scrollY / (window.innerHeight * 0.8);
-  }
-});
-</script>
-</body>
-</html>
+    <script>
+        const mareesData = {
+            dzaoudzi: {
+                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h33", height: "0.91m" }, { type: "Haute", time: "08h49", height: "3.08m" }, { type: "Basse", time: "14h59", height: "1.21m" }, { type: "Haute", time: "21h11", height: "3.01m" }] },
+                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h23", height: "1.10m" }, { type: "Haute", time: "09h51", height: "2.98m" }, { type: "Basse", time: "16h06", height: "1.38m" }, { type: "Haute", time: "22h11", height: "2.77m" }] },
+                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h20", height: "1.26m" }, { type: "Haute", time: "11h00", height: "2.91m" }, { type: "Basse", time: "17h22", height: "1.47m" }, { type: "Haute", time: "23h22", height: "2.60m" }] },
+                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h29", height: "1.37m" }, { type: "Haute", time: "12h12", height: "2.91m" }, { type: "Basse", time: "18h42", height: "1.45m" }, { type: "Haute", time: "00h40", height: "2.54m" }] },
+                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h40", height: "2.54m" }, { type: "Basse", time: "06h43", height: "1.38m" }, { type: "Haute", time: "13h16", height: "2.97m" }, { type: "Basse", time: "19h50", height: "1.34m" }] },
+                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h50", height: "2.58m" }, { type: "Basse", time: "07h46", height: "1.30m" }, { type: "Haute", time: "14h10", height: "3.07m" }, { type: "Basse", time: "20h43", height: "1.19m" }] },
+                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h45", height: "2.67m" }, { type: "Basse", time: "08h36", height: "1.19m" }, { type: "Haute", time: "14h55", height: "3.18m" }, { type: "Basse", time: "21h27", height: "1.05m" }] }
+            },
+            mamoudzou: {
+                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h35", height: "0.88m" }, { type: "Haute", time: "08h50", height: "3.10m" }, { type: "Basse", time: "15h01", height: "1.19m" }, { type: "Haute", time: "21h13", height: "3.03m" }] },
+                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h25", height: "1.08m" }, { type: "Haute", time: "09h53", height: "3.00m" }, { type: "Basse", time: "16h08", height: "1.36m" }, { type: "Haute", time: "22h13", height: "2.79m" }] },
+                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h22", height: "1.24m" }, { type: "Haute", time: "11h02", height: "2.93m" }, { type: "Basse", time: "17h24", height: "1.45m" }, { type: "Haute", time: "23h24", height: "2.62m" }] },
+                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h31", height: "1.35m" }, { type: "Haute", time: "12h14", height: "2.93m" }, { type: "Basse", time: "18h44", height: "1.43m" }, { type: "Haute", time: "00h42", height: "2.56m" }] },
+                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h42", height: "2.56m" }, { type: "Basse", time: "06h45", height: "1.36m" }, { type: "Haute", time: "13h18", height: "2.99m" }, { type: "Basse", time: "19h52", height: "1.32m" }] },
+                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h52", height: "2.60m" }, { type: "Basse", time: "07h48", height: "1.28m" }, { type: "Haute", time: "14h12", height: "3.09m" }, { type: "Basse", time: "20h45", height: "1.17m" }] },
+                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h47", height: "2.69m" }, { type: "Basse", time: "08h38", height: "1.17m" }, { type: "Haute", time: "14h57", height: "3.20m" }, { type: "Basse", time: "21h29", height: "1.03m" }] }
+            },
+            koungou: {
+                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h40", height: "0.93m" }, { type: "Haute", time: "08h55", height: "3.05m" }, { type: "Basse", time: "15h06", height: "1.23m" }, { type: "Haute", time: "21h18", height: "2.98m" }] },
+                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h30", height: "1.12m" }, { type: "Haute", time: "09h58", height: "2.95m" }, { type: "Basse", time: "16h13", height: "1.40m" }, { type: "Haute", time: "22h18", height: "2.74m" }] },
+                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h27", height: "1.28m" }, { type: "Haute", time: "11h07", height: "2.88m" }, { type: "Basse", time: "17h29", height: "1.49m" }, { type: "Haute", time: "23h29", height: "2.57m" }] },
+                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h36", height: "1.39m" }, { type: "Haute", time: "12h19", height: "2.88m" }, { type: "Basse", time: "18h49", height: "1.47m" }, { type: "Haute", time: "00h47", height: "2.51m" }] },
+                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h47", height: "2.51m" }, { type: "Basse", time: "06h50", height: "1.40m" }, { type: "Haute", time: "13h23", height: "2.94m" }, { type: "Basse", time: "19h57", height: "1.36m" }] },
+                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h57", height: "2.55m" }, { type: "Basse", time: "07h53", height: "1.32m" }, { type: "Haute", time: "14h17", height: "3.04m" }, { type: "Basse", time: "20h50", height: "1.21m" }] },
+                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h52", height: "2.64m" }, { type: "Basse", time: "08h43", height: "1.21m" }, { type: "Haute", time: "15h02", height: "3.15m" }, { type: "Basse", time: "21h34", height: "1.07m" }] }
+            },
+            sada: {
+                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h32", height: "0.95m" }, { type: "Haute", time: "08h48", height: "3.06m" }, { type: "Basse", time: "14h58", height: "1.22m" }, { type: "Haute", time: "21h10", height: "3.02m" }] },
+                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h22", height: "1.14m" }, { type: "Haute", time: "09h50", height: "2.96m" }, { type: "Basse", time: "16h05", height: "1.39m
