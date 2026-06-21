@@ -6,163 +6,112 @@
     <title>Marées Mayotte</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 30px;
-        }
-        h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-        .selectors {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .selector-group {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
-            font-size: 14px;
-        }
-        select {
-            padding: 12px;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            background: white;
-            color: #333;
-        }
-        select:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
-        }
-        .tides-result {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .result-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .tide-item {
-            background: white;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #667eea;
-        }
-        .tide-type {
-            font-weight: 600;
-            color: #764ba2;
-        }
-        .tide-time {
-            color: #667eea;
-            font-weight: 600;
-        }
-        .tide-height {
-            color: #888;
-            font-size: 13px;
-        }
-        .info-box {
-            background: #e8f4f8;
-            border-left: 4px solid #667eea;
-            padding: 12px;
-            margin-top: 20px;
-            border-radius: 5px;
-            font-size: 13px;
-            color: #555;
-        }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); padding: 30px; max-width: 600px; width: 100%; }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .selectors { display: flex; gap: 15px; margin-bottom: 30px; }
+        select { flex: 1; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        select:focus { outline: none; border-color: #764ba2; }
+        .resultat { background: #f8f9fa; border-radius: 10px; padding: 20px; }
+        .date-title { font-size: 18px; font-weight: bold; color: #667eea; margin-bottom: 15px; text-align: center; }
+        .maree-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        .maree-item:last-child { border-bottom: none; }
+        .maree-type { font-weight: bold; color: #764ba2; }
+        .maree-info { text-align: right; }
+        .maree-heure { color: #333; }
+        .maree-hauteur { color: #667eea; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌊 Marées Mayotte</h1>
+        <h1>🌊 Marées de Mayotte</h1>
         
         <div class="selectors">
-            <div class="selector-group">
-                <label for="ville">Ville</label>
-                <select id="ville">
-                    <option value="dzaoudzi">Dzaoudzi</option>
-                    <option value="mamoudzou">Mamoudzou</option>
-                    <option value="koungou">Koungou</option>
-                    <option value="sada">Sada</option>
-                </select>
-            </div>
-            <div class="selector-group">
-                <label for="jour">Jour</label>
-                <select id="jour">
-                    <option value="21">21 juin</option>
-                    <option value="22">22 juin</option>
-                    <option value="23">23 juin</option>
-                    <option value="24">24 juin</option>
-                    <option value="25">25 juin</option>
-                    <option value="26">26 juin</option>
-                    <option value="27">27 juin</option>
-                </select>
-            </div>
+            <select id="citySelect">
+                <option value="">Choisir une ville...</option>
+                <option value="dzaoudzi">Dzaoudzi</option>
+                <option value="mamoudzou">Mamoudzou</option>
+                <option value="koungou">Koungou</option>
+            </select>
+            
+            <select id="daySelect">
+                <option value="">Choisir un jour...</option>
+                <option value="21">21 Juin</option>
+                <option value="22">22 Juin</option>
+                <option value="23">23 Juin</option>
+                <option value="24">24 Juin</option>
+                <option value="25">25 Juin</option>
+                <option value="26">26 Juin</option>
+                <option value="27">27 Juin</option>
+            </select>
         </div>
 
-        <div class="tides-result" id="tidesResult"></div>
-        <div class="info-box">Données officielles SHOM • Heure locale Mayotte (UTC+3)</div>
+        <div class="resultat" id="resultat">
+            <p style="text-align: center; color: #999;">Sélectionne une ville et un jour</p>
+        </div>
     </div>
 
     <script>
         const mareesData = {
             dzaoudzi: {
-                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h33", height: "0.91m" }, { type: "Haute", time: "08h49", height: "3.08m" }, { type: "Basse", time: "14h59", height: "1.21m" }, { type: "Haute", time: "21h11", height: "3.01m" }] },
-                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h23", height: "1.10m" }, { type: "Haute", time: "09h51", height: "2.98m" }, { type: "Basse", time: "16h06", height: "1.38m" }, { type: "Haute", time: "22h11", height: "2.77m" }] },
-                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h20", height: "1.26m" }, { type: "Haute", time: "11h00", height: "2.91m" }, { type: "Basse", time: "17h22", height: "1.47m" }, { type: "Haute", time: "23h22", height: "2.60m" }] },
-                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h29", height: "1.37m" }, { type: "Haute", time: "12h12", height: "2.91m" }, { type: "Basse", time: "18h42", height: "1.45m" }, { type: "Haute", time: "00h40", height: "2.54m" }] },
-                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h40", height: "2.54m" }, { type: "Basse", time: "06h43", height: "1.38m" }, { type: "Haute", time: "13h16", height: "2.97m" }, { type: "Basse", time: "19h50", height: "1.34m" }] },
-                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h50", height: "2.58m" }, { type: "Basse", time: "07h46", height: "1.30m" }, { type: "Haute", time: "14h10", height: "3.07m" }, { type: "Basse", time: "20h43", height: "1.19m" }] },
-                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h45", height: "2.67m" }, { type: "Basse", time: "08h36", height: "1.19m" }, { type: "Haute", time: "14h55", height: "3.18m" }, { type: "Basse", time: "21h27", height: "1.05m" }] }
+                21: { date: "Dimanche 21 juin", marees: [{type: "Marée Basse", time: "02h33", height: "0.91m"}, {type: "Marée Haute", time: "08h49", height: "3.08m"}, {type: "Marée Basse", time: "14h59", height: "1.21m"}, {type: "Marée Haute", time: "21h11", height: "3.01m"}]},
+                22: { date: "Lundi 22 juin", marees: [{type: "Marée Basse", time: "03h23", height: "1.10m"}, {type: "Marée Haute", time: "09h51", height: "2.98m"}, {type: "Marée Basse", time: "16h06", height: "1.38m"}, {type: "Marée Haute", time: "22h11", height: "2.77m"}]},
+                23: { date: "Mardi 23 juin", marees: [{type: "Marée Basse", time: "04h20", height: "1.26m"}, {type: "Marée Haute", time: "11h00", height: "2.91m"}, {type: "Marée Basse", time: "17h22", height: "1.47m"}, {type: "Marée Haute", time: "23h22", height: "2.60m"}]},
+                24: { date: "Mercredi 24 juin", marees: [{type: "Marée Basse", time: "05h29", height: "1.37m"}, {type: "Marée Haute", time: "12h12", height: "2.91m"}, {type: "Marée Basse", time: "18h42", height: "1.45m"}, {type: "Marée Haute", time: "00h40+1", height: "2.54m"}]},
+                25: { date: "Jeudi 25 juin", marees: [{type: "Marée Haute", time: "00h40", height: "2.54m"}, {type: "Marée Basse", time: "06h43", height: "1.38m"}, {type: "Marée Haute", time: "13h16", height: "2.97m"}, {type: "Marée Basse", time: "19h50", height: "1.34m"}]},
+                26: { date: "Vendredi 26 juin", marees: [{type: "Marée Haute", time: "01h50", height: "2.58m"}, {type: "Marée Basse", time: "07h46", height: "1.30m"}, {type: "Marée Haute", time: "14h10", height: "3.07m"}, {type: "Marée Basse", time: "20h43", height: "1.19m"}]},
+                27: { date: "Samedi 27 juin", marees: [{type: "Marée Haute", time: "02h45", height: "2.67m"}, {type: "Marée Basse", time: "08h36", height: "1.19m"}, {type: "Marée Haute", time: "14h55", height: "3.18m"}, {type: "Marée Basse", time: "21h27", height: "1.05m"}]}
             },
             mamoudzou: {
-                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h35", height: "0.88m" }, { type: "Haute", time: "08h50", height: "3.10m" }, { type: "Basse", time: "15h01", height: "1.19m" }, { type: "Haute", time: "21h13", height: "3.03m" }] },
-                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h25", height: "1.08m" }, { type: "Haute", time: "09h53", height: "3.00m" }, { type: "Basse", time: "16h08", height: "1.36m" }, { type: "Haute", time: "22h13", height: "2.79m" }] },
-                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h22", height: "1.24m" }, { type: "Haute", time: "11h02", height: "2.93m" }, { type: "Basse", time: "17h24", height: "1.45m" }, { type: "Haute", time: "23h24", height: "2.62m" }] },
-                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h31", height: "1.35m" }, { type: "Haute", time: "12h14", height: "2.93m" }, { type: "Basse", time: "18h44", height: "1.43m" }, { type: "Haute", time: "00h42", height: "2.56m" }] },
-                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h42", height: "2.56m" }, { type: "Basse", time: "06h45", height: "1.36m" }, { type: "Haute", time: "13h18", height: "2.99m" }, { type: "Basse", time: "19h52", height: "1.32m" }] },
-                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h52", height: "2.60m" }, { type: "Basse", time: "07h48", height: "1.28m" }, { type: "Haute", time: "14h12", height: "3.09m" }, { type: "Basse", time: "20h45", height: "1.17m" }] },
-                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h47", height: "2.69m" }, { type: "Basse", time: "08h38", height: "1.17m" }, { type: "Haute", time: "14h57", height: "3.20m" }, { type: "Basse", time: "21h29", height: "1.03m" }] }
+                21: { date: "Dimanche 21 juin", marees: [{type: "Marée Basse", time: "02h35", height: "0.88m"}, {type: "Marée Haute", time: "08h50", height: "3.10m"}, {type: "Marée Basse", time: "15h01", height: "1.19m"}, {type: "Marée Haute", time: "21h13", height: "3.03m"}]},
+                22: { date: "Lundi 22 juin", marees: [{type: "Marée Basse", time: "03h25", height: "1.08m"}, {type: "Marée Haute", time: "09h53", height: "3.00m"}, {type: "Marée Basse", time: "16h08", height: "1.36m"}, {type: "Marée Haute", time: "22h13", height: "2.79m"}]},
+                23: { date: "Mardi 23 juin", marees: [{type: "Marée Basse", time: "04h22", height: "1.24m"}, {type: "Marée Haute", time: "11h02", height: "2.93m"}, {type: "Marée Basse", time: "17h24", height: "1.45m"}, {type: "Marée Haute", time: "23h24", height: "2.62m"}]},
+                24: { date: "Mercredi 24 juin", marees: [{type: "Marée Basse", time: "05h31", height: "1.35m"}, {type: "Marée Haute", time: "12h14", height: "2.93m"}, {type: "Marée Basse", time: "18h44", height: "1.43m"}, {type: "Marée Haute", time: "00h42+1", height: "2.56m"}]},
+                25: { date: "Jeudi 25 juin", marees: [{type: "Marée Haute", time: "00h42", height: "2.56m"}, {type: "Marée Basse", time: "06h45", height: "1.36m"}, {type: "Marée Haute", time: "13h18", height: "2.99m"}, {type: "Marée Basse", time: "19h52", height: "1.32m"}]},
+                26: { date: "Vendredi 26 juin", marees: [{type: "Marée Haute", time: "01h52", height: "2.60m"}, {type: "Marée Basse", time: "07h48", height: "1.28m"}, {type: "Marée Haute", time: "14h12", height: "3.09m"}, {type: "Marée Basse", time: "20h45", height: "1.17m"}]},
+                27: { date: "Samedi 27 juin", marees: [{type: "Marée Haute", time: "02h47", height: "2.69m"}, {type: "Marée Basse", time: "08h38", height: "1.17m"}, {type: "Marée Haute", time: "14h57", height: "3.20m"}, {type: "Marée Basse", time: "21h29", height: "1.03m"}]}
             },
             koungou: {
-                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h40", height: "0.93m" }, { type: "Haute", time: "08h55", height: "3.05m" }, { type: "Basse", time: "15h06", height: "1.23m" }, { type: "Haute", time: "21h18", height: "2.98m" }] },
-                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h30", height: "1.12m" }, { type: "Haute", time: "09h58", height: "2.95m" }, { type: "Basse", time: "16h13", height: "1.40m" }, { type: "Haute", time: "22h18", height: "2.74m" }] },
-                23: { mareedim: "Mardi 23 juin", marees: [{ type: "Basse", time: "04h27", height: "1.28m" }, { type: "Haute", time: "11h07", height: "2.88m" }, { type: "Basse", time: "17h29", height: "1.49m" }, { type: "Haute", time: "23h29", height: "2.57m" }] },
-                24: { mareedim: "Mercredi 24 juin", marees: [{ type: "Basse", time: "05h36", height: "1.39m" }, { type: "Haute", time: "12h19", height: "2.88m" }, { type: "Basse", time: "18h49", height: "1.47m" }, { type: "Haute", time: "00h47", height: "2.51m" }] },
-                25: { mareedim: "Jeudi 25 juin", marees: [{ type: "Haute", time: "00h47", height: "2.51m" }, { type: "Basse", time: "06h50", height: "1.40m" }, { type: "Haute", time: "13h23", height: "2.94m" }, { type: "Basse", time: "19h57", height: "1.36m" }] },
-                26: { mareedim: "Vendredi 26 juin", marees: [{ type: "Haute", time: "01h57", height: "2.55m" }, { type: "Basse", time: "07h53", height: "1.32m" }, { type: "Haute", time: "14h17", height: "3.04m" }, { type: "Basse", time: "20h50", height: "1.21m" }] },
-                27: { mareedim: "Samedi 27 juin", marees: [{ type: "Haute", time: "02h52", height: "2.64m" }, { type: "Basse", time: "08h43", height: "1.21m" }, { type: "Haute", time: "15h02", height: "3.15m" }, { type: "Basse", time: "21h34", height: "1.07m" }] }
-            },
-            sada: {
-                21: { mareedim: "Dimanche 21 juin", marees: [{ type: "Basse", time: "02h32", height: "0.95m" }, { type: "Haute", time: "08h48", height: "3.06m" }, { type: "Basse", time: "14h58", height: "1.22m" }, { type: "Haute", time: "21h10", height: "3.02m" }] },
-                22: { mareedim: "Lundi 22 juin", marees: [{ type: "Basse", time: "03h22", height: "1.14m" }, { type: "Haute", time: "09h50", height: "2.96m" }, { type: "Basse", time: "16h05", height: "1.39m
+                21: { date: "Dimanche 21 juin", marees: [{type: "Marée Basse", time: "02h40", height: "0.93m"}, {type: "Marée Haute", time: "08h55", height: "3.05m"}, {type: "Marée Basse", time: "15h06", height: "1.23m"}, {type: "Marée Haute", time: "21h18", height: "2.98m"}]},
+                22: { date: "Lundi 22 juin", marees: [{type: "Marée Basse", time: "03h30", height: "1.12m"}, {type: "Marée Haute", time: "09h58", height: "2.95m"}, {type: "Marée Basse", time: "16h13", height: "1.40m"}, {type: "Marée Haute", time: "22h18", height: "2.74m"}]},
+                23: { date: "Mardi 23 juin", marees: [{type: "Marée Basse", time: "04h27", height: "1.28m"}, {type: "Marée Haute", time: "11h07", height: "2.88m"}, {type: "Marée Basse", time: "17h29", height: "1.49m"}, {type: "Marée Haute", time: "23h29", height: "2.57m"}]},
+                24: { date: "Mercredi 24 juin", marees: [{type: "Marée Basse", time: "05h36", height: "1.39m"}, {type: "Marée Haute", time: "12h19", height: "2.88m"}, {type: "Marée Basse", time: "18h49", height: "1.47m"}, {type: "Marée Haute", time: "00h47+1", height: "2.51m"}]},
+                25: { date: "Jeudi 25 juin", marees: [{type: "Marée Haute", time: "00h47", height: "2.51m"}, {type: "Marée Basse", time: "06h50", height: "1.40m"}, {type: "Marée Haute", time: "13h20", height: "2.95m"}, {type: "Marée Basse", time: "19h55", height: "1.36m"}]},
+                26: { date: "Vendredi 26 juin", marees: [{type: "Marée Haute", time: "01h57", height: "2.55m"}, {type: "Marée Basse", time: "07h53", height: "1.32m"}, {type: "Marée Haute", time: "14h15", height: "3.05m"}, {type: "Marée Basse", time: "20h48", height: "1.21m"}]},
+                27: { date: "Samedi 27 juin", marees: [{type: "Marée Haute", time: "02h52", height: "2.65m"}, {type: "Marée Basse", time: "08h43", height: "1.21m"}, {type: "Marée Haute", time: "15h00", height: "3.16m"}, {type: "Marée Basse", time: "21h32", height: "1.07m"}]}
+            }
+        };
+
+        document.getElementById('citySelect').addEventListener('change', afficherMarees);
+        document.getElementById('daySelect').addEventListener('change', afficherMarees);
+
+        function afficherMarees() {
+            const city = document.getElementById('citySelect').value;
+            const day = document.getElementById('daySelect').value;
+            const resultat = document.getElementById('resultat');
+
+            if (!city || !day) {
+                resultat.innerHTML = '<p style="text-align: center; color: #999;">Sélectionne une ville et un jour</p>';
+                return;
+            }
+
+            const data = mareesData[city][day];
+            let html = `<div class="date-title">${data.date} - ${city.charAt(0).toUpperCase() + city.slice(1)}</div>`;
+
+            data.marees.forEach(m => {
+                html += `
+                    <div class="maree-item">
+                        <span class="maree-type">${m.type}</span>
+                        <div class="maree-info">
+                            <div class="maree-heure">${m.time}</div>
+                            <div class="maree-hauteur">${m.height}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultat.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
