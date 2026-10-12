@@ -309,7 +309,46 @@ img{max-width:100%}
     <button class="tab" role="tab" id="tab-A" aria-controls="pageLigne" aria-selected="true" type="button">Ligne A<span class="cnt" id="tabA"></span></button>
     <button class="tab" role="tab" id="tab-B" aria-controls="pageLigne" aria-selected="false" type="button">Ligne B<span class="cnt" id="tabB"></span></button>
     <button class="tab" role="tab" id="tab-voies" aria-controls="pageVoies" aria-selected="false" type="button">Voies de garage<span class="cnt" id="tabCnt"></span></button>
+    <button class="tab" role="tab" id="tab-ref" aria-controls="pageRef" aria-selected="false" type="button">Références supports</button>
+    <button class="tab" role="tab" id="tab-plan" aria-controls="pagePlan" aria-selected="false" type="button">Planning</button>
   </div>
+  <section class="yard" id="pagePlan" role="tabpanel" aria-labelledby="tab-plan" hidden>
+    <p class="info" style="margin:0 0 10px">Le planning dit à chaque ligne quoi produire : la référence (couches, pince), le nombre de wagons et leur couleur. L’ordre en cours est appliqué automatiquement à chaque wagon chargé ; quand il est terminé, l’ordre suivant démarre tout seul.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap"><div class="card" style="padding:12px 14px;flex:1 1 380px;min-width:0"><h3 style="margin:0 0 8px;font-size:15px">Ligne A <span class="info" style="font-weight:400">· voie 3</span></h3>
+        <div id="plCurA"></div>
+        <h4 style="margin:12px 0 6px;font-size:13px">À suivre</h4><div id="plNextA"></div>
+        <h4 style="margin:12px 0 6px;font-size:13px">Ajouter un ordre de production</h4>
+        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefA" class="numin" style="min-width:230px"></select></label>
+          <label class="crow" style="font-size:12.5px">Wagons à produire <input type="number" id="plNA" min="1" max="500" value="10" class="numin" style="width:64px"></label></div>
+        <div class="crow" style="flex-wrap:wrap;margin-top:6px"><span style="font-size:12.5px">Couleur</span><span id="plColA" style="display:inline-flex;gap:3px;flex-wrap:wrap"></span></div>
+        <button class="btn pri" id="plAddA" type="button" style="margin-top:8px">Ajouter au planning</button></div><div class="card" style="padding:12px 14px;flex:1 1 380px;min-width:0"><h3 style="margin:0 0 8px;font-size:15px">Ligne B <span class="info" style="font-weight:400">· voie 1</span></h3>
+        <div id="plCurB"></div>
+        <h4 style="margin:12px 0 6px;font-size:13px">À suivre</h4><div id="plNextB"></div>
+        <h4 style="margin:12px 0 6px;font-size:13px">Ajouter un ordre de production</h4>
+        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefB" class="numin" style="min-width:230px"></select></label>
+          <label class="crow" style="font-size:12.5px">Wagons à produire <input type="number" id="plNB" min="1" max="500" value="10" class="numin" style="width:64px"></label></div>
+        <div class="crow" style="flex-wrap:wrap;margin-top:6px"><span style="font-size:12.5px">Couleur</span><span id="plColB" style="display:inline-flex;gap:3px;flex-wrap:wrap"></span></div>
+        <button class="btn pri" id="plAddB" type="button" style="margin-top:8px">Ajouter au planning</button></div></div>
+    <p class="step" id="plMsg"></p>
+  </section>
+  <section class="yard" id="pageRef" role="tabpanel" aria-labelledby="tab-ref" hidden>
+    <div class="card hmibar"><div class="yc" style="flex:1 1 100%"><span class="fl">Référence en production sur chaque ligne</span></div>
+      <div class="yc"><span class="fl">Ligne A (voie 3)</span><select id="refSelA" class="numin" style="min-width:280px"></select><span class="info" id="refInfA"></span></div>
+      <div class="yc"><span class="fl">Ligne B (voie 1)</span><select id="refSelB" class="numin" style="min-width:280px"></select><span class="info" id="refInfB"></span></div>
+      <p class="step" id="refMsg" style="flex:1 1 100%"></p></div>
+    <div class="card" style="padding:12px 14px"><h3 style="margin:0 0 8px;font-size:15px">Références de supports</h3>
+      <p class="info" style="margin:0 0 8px">Chaque référence fixe le nombre de couches sur le wagon et le nombre de couches que la pince prend et pose à chaque fois (« posées 3 par 3 »). Le nombre de couches doit être un multiple du nombre par prise. Modifiez une valeur directement dans le tableau.</p>
+      <div class="scroll"><table class="log" id="refTab"></table></div></div>
+    <div class="card hmibar"><div class="yc" style="flex:1 1 100%"><span class="fl">Ajouter une référence</span></div>
+      <div class="yc"><span class="crow" style="flex-wrap:wrap">
+        <label class="crow" style="font-size:12.5px">Référence <input id="rfCode" class="numin" style="width:90px" placeholder="ex. 101"></label>
+        <label class="crow" style="font-size:12.5px">Couches sur le wagon <input type="number" id="rfH" min="1" max="20" value="6" class="numin" style="width:60px"></label>
+        <label class="crow" style="font-size:12.5px">Couches par prise <input type="number" id="rfL" min="1" max="10" value="3" class="numin" style="width:60px"></label>
+        <label class="crow" style="font-size:12.5px">Colonnes <input type="number" id="rfC" min="1" max="10" value="5" class="numin" style="width:60px"></label>
+        <label class="crow" style="font-size:12.5px">Couleur <input type="color" id="rfCol" value="#2B4FA8"></label>
+        <button class="btn pri" id="rfAdd" type="button">Ajouter la référence</button></span></div>
+      <p class="info b" id="rfErr" style="flex:1 1 100%"></p></div>
+  </section>
   <section class="yard" id="pageVoies" role="tabpanel" aria-labelledby="tab-voies" hidden>
     <div class="card hmibar">
       <div class="consigne"><span>Consigne temps<br>de poussée</span><input type="number" id="cadM" min="0" max="600" class="numin hn" aria-label="Minutes"><span>min</span><input type="number" id="cadS" min="0" max="59" class="numin hn" aria-label="Secondes"><span>sec</span></div>
@@ -340,7 +379,7 @@ img{max-width:100%}
       <p class="step" id="adjMsg" style="flex:1 1 240px"></p>
     </div>
     <div class="card hmibar" id="serCard">
-      <div class="yc" style="flex:1 1 100%"><span class="fl">Séries de wagons : identifier une série par sa couleur</span></div>
+      <div class="yc" style="flex:1 1 100%"><span class="fl">Cadence de production des lignes</span></div><div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptA" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne A"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne A" id="ptMA"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptB" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne B"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne B" id="ptMB"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSB"></span></div><div class="yc" style="flex:1 1 100%"><span class="fl">Séries de wagons : identifier une série par sa couleur</span></div>
       <div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNA" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne A"><span>wagons · déjà faits</span><input type="number" id="serKA" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne A"><span class="sws" id="serCA" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoA" type="button">Lancer</button><button class="btn" id="serEndA" type="button">Terminer</button></span><span class="info" id="serSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNB" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne B"><span>wagons · déjà faits</span><input type="number" id="serKB" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne B"><span class="sws" id="serCB" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoB" type="button">Lancer</button><button class="btn" id="serEndB" type="button">Terminer</button></span><span class="info" id="serSB"></span></div>
       <p class="step" id="serMsg" style="flex:1 1 100%"></p>
     </div>
@@ -351,6 +390,7 @@ img{max-width:100%}
         <span class="crow" style="flex-wrap:wrap">Temps de déchargement :
           <button class="btn" type="button" data-sm="15">15 min</button><button class="btn" type="button" data-sm="30">30 min</button>
           <input type="number" id="selMin" min="1" max="600" value="20" class="numin" style="width:64px" aria-label="Minutes"><span>min</span><button class="btn pri" id="selApply" type="button">Appliquer</button></span>
+        <span class="crow" style="flex-wrap:wrap">Référence support : <select id="selRef" class="numin"></select><button class="btn" id="selRefGo" type="button">Appliquer</button></span>
         <span class="crow" style="flex-wrap:wrap">Couleur des wagons sélectionnés : <span id="selCol" style="display:inline-flex;gap:3px"></span></span>
         <span class="crow" style="flex-wrap:wrap">Déchargement en cours : <button class="btn" type="button" data-sd="stop">⏸ Stopper</button><button class="btn" type="button" data-sd="go">▶ Reprendre</button><button class="btn" type="button" data-sd="5">+5 min</button><button class="btn" type="button" data-sd="15">+15 min</button></span>
         <span class="crow" style="flex-wrap:wrap"><button class="btn" id="selDep" type="button">Tout le déchargement</button><button class="btn" id="selNow" type="button">Déchargés maintenant</button><button class="btn" id="selClear" type="button">Effacer la sélection</button><button class="btn" id="selEnd" type="button">Terminer</button></span>
@@ -364,7 +404,7 @@ img{max-width:100%}
       <nav class="mbar" id="mbar" aria-label="Réglages des machines"></nav>
       <p class="hint">Cliquez sur une machine, dans la barre ou directement sur le schéma, pour ouvrir sa fenêtre de réglages.</p>
       <div class="card stage">
-        <div class="scroll"><svg id="svg" viewBox="0 0 960 552" role="img" aria-label="Synoptique de la ligne">
+        <div class="scroll"><svg id="svg" viewBox="0 0 960 584" role="img" aria-label="Synoptique de la ligne">
           <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="mk"/></marker></defs>
           <g id="dyn"></g>
           <g id="hits"></g>
@@ -458,6 +498,7 @@ img{max-width:100%}
         <label class="crow"><input type="checkbox" id="wPre"> Wagon pré-séchoir (passe par le pré-séchoir avant le séchoir)</label>
         <div class="fld"><label class="fl" for="wDep">Temps de déchargement (min, approximatif)</label><span id="wDepLeft" class="info"></span><input type="number" id="wDep" min="1" max="600" class="numin" style="grid-column:1/-1;width:120px"></div>
         <button class="btn" id="wDepNow" type="button" hidden>Déchargé maintenant : avancer au chargement</button>
+        <div class="fld"><label class="fl" for="wRef">Référence support à charger</label><span></span><select id="wRef" class="numin" style="grid-column:1/-1"></select></div>
         <div><span class="fl">Voie de déchargement au retour</span><div class="seg" role="group" aria-label="Voie de dépilage" id="wRet" style="margin-top:6px"><button type="button" data-ret="1">Voie 1</button><button type="button" data-ret="3">Voie 3</button></div></div>
         <p class="info b" id="wErr" hidden></p>
       </div>
@@ -733,6 +774,12 @@ function render(){
   const wl=W.ph==='yard'?`wagon plein · attente d’un wagon vide sur la voie ${ACT.id==='A'?YP.exA:YP.exB}`:W.ph==='swap'?`changement de train · ${cd(P.tSwap*(1-W.p))}`
     :W.ph==='shift'?`avance au wagon ${W.w+2}/${nW} · ${cd(P.tShift*(1-W.p))}`
     :`wagon ${W.w+1}/${nW} · pile ${Math.min(W.col+1,P.cols)}/${P.cols} : ${W.h}/${P.pileH} couches`;
+  {const L=ACT.id,lw=lineWagons(L),dc=W.w+(W.ph==='shift'||W.ph==='swap'?1:0),numAt=i=>i<dc?lw.done[dc-1-i]:lw.up[i-dc];
+    for(let i=0;i<nW;i++){const x=32+i*(tw+6),w=numAt(i);if(w)s+=`<text x="${(x+tw/2).toFixed(1)}" y="496" text-anchor="middle" style="font:600 10px var(--f-mono)">${no3(w.no)}</text>`}
+    const cur=lw.up[0],prev=lw.done[0],next=lw.up[1];
+    if(YP['ptOn'+L]){const T=Math.max(1,YP['pt'+L])*60;s+=`<text x="944" y="570" text-anchor="end" style="font-size:12px;font-weight:600;fill:var(--accent)">Cadence fixe : 1 wagon / ${YP['pt'+L]} min · prochain dans ${cd(T-(Y.pt[L]||0))}</text>`}
+    {const {w:tw2,r:rf,plan:pl}=wagRef(L);if(rf)s+=`<text x="944" y="552" text-anchor="end" style="font-size:12px;font-weight:600">${tw2?'Wagon '+no3(tw2.no)+' · ':''}référence ${rf.code}${pl?` (planning ${pl.done}/${pl.n})`:tw2&&tw2.ref===rf.code?' (lue sur le wagon)':' (référence de la ligne)'} : ${rf.h} couches posées ${rf.l} par ${rf.l} · ${rf.c} colonnes</text>`}
+    s+=`<text x="32" y="570" style="font-size:12px;font-weight:600">Ligne ${L} · voie ${lw.v} — wagon en chargement : <tspan style="font-family:var(--f-mono)">${cur?no3(cur.no):'aucun (attente d’un wagon vide)'}</tspan>   ·   précédent : <tspan style="font-family:var(--f-mono)">${prev?no3(prev.no):'—'}</tspan>   ·   suivant : <tspan style="font-family:var(--f-mono)">${next?no3(next.no):'—'}</tspan></text>`}
   s+=`<text x="32" y="534" class="dim">${wl}</text>`;
   s+=`<text x="32" y="548" class="dim">pile = ${prisesParPile()} prise${prisesParPile()>1?'s':''} × ${P.layers} couches = ${P.pileH} couches · wagon complet = ${P.cols} colonnes × ${P.pileH} couches × 8 = ${fmt(capWag(),0)} supports</text>`;
 
@@ -948,9 +995,9 @@ function updT3(){
 /* ---------- cartographie des voies : circuit fermé des wagons (commun aux lignes A et B) ---------- */
 const YKEY='ligne-voies-v3';
 const YD={fleet:100,e1:2,d1:3,e3:2,d3:3,v2Max:2,v4Max:25,psMax:4,seMax:27,seZones:11,enMax:3,pfMax:8,saMax:1,foMax:34,
-  cadM:19,cadS:0,cadOn:1,v4Start:'A',v4Strict:1,depMode:'line',dm2:1,preA:1,preB:0,exA:3,exB:1,manOn:1,tMan:20,tDep:15,colA:'#2B4FA8',colB:'#C8372D',acc:2,mMax:3,v4bMax:4,fxMax:3,stopA:0,stopB:0};
+  cadM:19,cadS:0,cadOn:1,v4Start:'A',v4Strict:1,depMode:'line',dm2:1,ex2:1,preA:1,preB:0,exA:3,exB:1,manOn:1,tMan:20,tDep:15,colA:'#2B4FA8',colB:'#C8372D',acc:2,ptA:15,ptB:15,ptOnA:0,ptOnB:0,mMax:3,v4bMax:4,fxMax:3,stopA:0,stopB:0};
 const YP=Object.assign({},YD);
-try{const s=JSON.parse(localStorage.getItem(YKEY)||'null');if(s){for(const k in YD)if(typeof s[k]===typeof YD[k])YP[k]=s[k];if(!('depMode' in s)||s.tDep===30)YP.tDep=15;if(!('dm2' in s)){YP.depMode='line';YP.dm2=1}}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(YKEY)||'null');if(s){for(const k in YD)if(typeof s[k]===typeof YD[k])YP[k]=s[k];if(!('depMode' in s)||s.tDep===30)YP.tDep=15;if(!('dm2' in s)){YP.depMode='line';YP.dm2=1}if(!('ex2' in s)){YP.exA=3;YP.exB=1;YP.ex2=1}}}catch(e){}
 const normE=()=>{YP.acc=Math.max(1,Math.min(2,YP.acc|0||2));YP.e1=YP.e3=YP.acc+1};normE(); // chargement = 1 wagon en place + les wagons chargés accumulés devant
 const ysave=()=>{normE();try{localStorage.setItem(YKEY,JSON.stringify(YP))}catch(e){}};
 const SW=['#2B4FA8','#C8372D','#E8C72E','#151A4A','#2E8955','#7A4FA0','#1F8A8A','#8B5A2B','#E36D9B','#F2F2F2'];
@@ -959,7 +1006,7 @@ const lineOf=v=>YP.exA===v?'A':YP.exB===v?'B':'—';
 // tunnels (positions fixes, null = place vide) : pré-séchoir, séchoir, engobage, préfour, four
 const TUN=['ps','se','en','pf','sa','fo'],TMAX={ps:()=>YP.psMax,se:()=>YP.seMax,en:()=>YP.enMax,pf:()=>YP.pfMax,sa:()=>YP.saMax,fo:()=>YP.foMax};
 const TNAME={ps:'Pré-séchoir',se:'Séchoir',en:'Engobage',pf:'Préfour',sa:'Sas',fo:'Four'};
-const Y={ser:{A:null,B:null},mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
+const Y={plan:{A:[],B:[]},trOff:{},pt:{A:0,B:0},ser:{A:null,B:null},mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
   T2:{ph:'idle',p:0,w:null,from:1,last:3,next:null,wait:null,seq:[]},T3:{ph:'idle',p:0,w:null,to:1,nextL:'A'},flash:{t1:0,t4:0,t3p:0,tr:{}},log:[]};
 TUN.forEach(k=>{Y[k]=Array(TMAX[k]()).fill(null)});
 function fitTun(k){const n=TMAX[k](),a=Y[k],ws=a.filter(Boolean);if(a.length===n)return;
@@ -984,15 +1031,45 @@ function addLog(org,w,txt,zone,auto){
 }
 let logDirty=true;
 // la ligne remplit un wagon vide de sa zone de chargement ; sinon un nouveau wagon entre si le circuit n'est pas complet
+/* ---------- références de supports ---------- */
+const RKEY='ligne-references-v1';
+const RF={refs:[{code:'101',h:6,l:3,c:5,col:'#2B4FA8'},{code:'205',h:5,l:5,c:5,col:'#C8372D'}],ln:{A:'',B:''}};
+try{const s=JSON.parse(localStorage.getItem(RKEY)||'null');if(s&&Array.isArray(s.refs)){RF.refs=s.refs;RF.ln=Object.assign({A:'',B:''},s.ln||{})}}catch(e){}
+const rfSave=()=>{try{localStorage.setItem(RKEY,JSON.stringify(RF))}catch(e){}};
+const refOf=L=>RF.refs.find(r=>r.code===RF.ln[L])||null;
+const refByCode=c=>RF.refs.find(r=>r.code===c)||null;
+// référence du wagon que la ligne prépare : celle du wagon s'il en a une, sinon celle de la ligne
+function nextWag(v){ // prochain wagon qui arrivera au chargement de la voie v (le plus proche dans le circuit)
+  const e=Y.E[v].find(x=>!x.loaded)||Y.M[v][0]||Y.D[v][0];if(e)return e;const rv=a=>[...a].reverse();
+  const ch=[Y.T3.job==='fo'?Y.T3.w:null,...Y.fx,...rv(Y.fo),...rv(Y.sa),...rv(Y.pf),Y.t1w,...rv(Y.en),...rv(Y.se),...rv(Y.ps),Y.psIn,...Y.v4b,...Y.v4];
+  return ch.find(x=>x&&x.ret===v)||null}
+const planCur=L=>(Y.plan&&Y.plan[L]&&Y.plan[L][0])||null;
+function wagRef(L){const v=L==='A'?YP.exA:YP.exB,w=nextWag(v),o=planCur(L);if(o&&refByCode(o.ref))return {w,r:refByCode(o.ref),plan:o};return {w,r:(w&&w.ref&&refByCode(w.ref))||refOf(L)}}
+function autoRef(){for(const ln of LINES){const L=ln.id,{w,r}=wagRef(L);if(!r)continue;const W=ln.S&&ln.S.wagon;if(!W||W.ph!=='fill'||W.col!==0||W.h!==0)continue; // on ne change qu'au début d'un wagon
+    if(ln.curRef===r.code&&ln.P.pileH===r.h&&ln.P.layers===r.l&&ln.P.cols===r.c)continue;const was=ln.curRef;applyRef(L,ln===ACT,r);
+    if(was!==undefined&&was!==r.code)addLog('OP',w||null,`Ligne ${L} : référence ${r.code} lue sur le wagon à préparer (${r.h} couches posées ${r.l} par ${r.l})`,`Voie ${L==='A'?YP.exA:YP.exB} chargement`,'API 1')}}
+function applyRef(L,ui=true,rr){const r=rr||refOf(L),ln=LINES.find(l=>l.id===L);if(!r||!ln)return;const p=ln.P;ln.curRef=r.code;
+  p.layers=r.l;p.pileH=r.h;p.cols=r.c;p.pileMax=Math.max(p.pileMax,r.h);
+  if(ln.S&&ln.S.wagon){const W=ln.S.wagon;if(W.h>r.h||W.h%r.l)W.h=0;if(W.col>=r.c)W.col=r.c-1}
+  try{localStorage.setItem(ln.key,JSON.stringify(p))}catch(e){}
+  if(ui&&ln===ACT)try{syncPanel();buildRates();updateMeas()}catch(e){}}
+const trOn=n=>!(Y.trOff&&Y.trOff[n]);
+function lineWagons(L){const v=L==='A'?YP.exA:YP.exB;return {v,done:recentOf(L),up:[...Y.E[v].filter(w=>!w.loaded),...Y.M[v]]}}
 function parkWagon(sup){
   const vn=CUR.id==='A'?YP.exA:YP.exB,E=Y.E[vn];
   let w=E.find(x=>!x.loaded);
   if(!w){if(E.length>=YP['e'+vn]||allW().length>=YP.fleet)return false;
-    w={uid:++Y.uid,no:++Y.no,color:CUR.id==='A'?YP.colA:YP.colB,pre:!!(CUR.id==='A'?YP.preA:YP.preB),ret:vn};E.push(w)}
+    w={uid:++Y.uid,no:++Y.no,color:CUR.id==='A'?YP.colA:YP.colB,pre:!!(CUR.id==='A'?YP.preA:YP.preB),ret:vn,ref:CUR.curRef||null};E.push(w)} // nouveau wagon : il reçoit la référence que la ligne vient de produire
+  const i0=E.indexOf(w),p0=i0>=0?ePos(vn,i0):LOADX;
   w.loaded=true;w.sup=sup;w.line=CUR.id;w.tz=0;w.lt=Y.simT;
-  const sr=Y.ser&&Y.ser[CUR.id];let st='';
+  {const p1=ePos(vn,E.indexOf(w));if(Math.abs(p1-p0)>1)Y.mv.push({uid:w.uid,pts:[[p0,VY[vn]],[p1,VY[vn]]],t:0,dur:6,tr:vn===1?14:34})}
+  const sr=Y.ser&&Y.ser[CUR.id];let st='';const po=planCur(CUR.id);
+  if(po){po.done++;w.color=po.color;w.ref=po.ref;w.ser={id:po.id,i:po.done,n:po.n};st=` · planning ${po.ref} ${po.done}/${po.n}`;
+    if(po.done>=po.n){Y.plan[CUR.id].shift();const nx=planCur(CUR.id);addLog('OP',w,`Planning ligne ${CUR.id} : ordre ${po.ref} terminé (${po.n} wagons)${nx?` · ordre suivant : ${nx.ref}, ${nx.n} wagons`:' · planning vide'}`,`Voie ${vn} chargement`,'Poste')}
+    addLog('CH',w,`Wagon chargé ligne ${CUR.id} (${fmt(sup,0)} supports)${st}`,`Voie ${vn} chargement`);return true}
   if(sr&&sr.done<sr.n){sr.done++;w.color=sr.color;w.ser={id:sr.id,i:sr.done,n:sr.n};st=` · série ${sr.done}/${sr.n}`;if(sr.done>=sr.n){addLog('OP',w,`Série ligne ${CUR.id} terminée (${sr.n} wagons)`,`Voie ${vn} chargement`,'Poste');Y.ser[CUR.id]=null}}
-  else if(w.ser){w.ser=null;w.color=CUR.id==='A'?YP.colA:YP.colB}
+  else{w.ser=null;const rf=(w.ref&&refByCode(w.ref))||refOf(CUR.id);w.color=rf?rf.col:(CUR.id==='A'?YP.colA:YP.colB)} // hors série : couleur de la référence ou du thème de la ligne
+  {const rf=(w.ref&&refByCode(w.ref))||refOf(CUR.id);w.ref=rf?rf.code:null;if(rf&&!w.ser)w.color=rf.col}
   addLog('CH',w,`Wagon chargé ligne ${CUR.id} (${fmt(sup,0)} supports)${st}`,`Voie ${vn} chargement`);return true;
 }
 // une poussée : tous les tunnels avancent d'une position, de l'aval vers l'amont
@@ -1007,29 +1084,33 @@ function pushCore(){
   const exp=Y.seqNext||YP.v4Start;
   const lastIdx=a=>{for(let i=a.length-1;i>=0;i--)if(a[i])return i;return -1};
   const pi=lastIdx(Y.ps),psW=pi>=0?Y.ps[pi]:null;
-  const iExp=Y.v4.findIndex(w=>!w.pre&&w.line===exp),iAny=Y.v4.findIndex(w=>!w.pre);
-  let choice=null;
-  const psOk=!!psW&&!!Y.psIn&&!Y.ps.includes(null); // le pré-séchoir garde toujours ses wagons : la sortie n'a lieu que si le remplaçant attend déjà à l'entrée (déposé par le transbordeur 3)
-  if(psOk&&psW.line===exp)choice='ps';else if(iExp>=0)choice=iExp;else if(!YP.v4Strict){if(psOk)choice='ps';else if(iAny>=0)choice=iAny}
   Y.lastPush={se:null,v4:false,v4b:false};let moved=false;
+  // voie 4 = une seule file : seul le wagon de tête (côté transbordeur 4) peut sortir, aucun wagon ne passe devant un autre
+  while(trOn(42)&&Y.v4[0]&&Y.v4[0].pre&&Y.v4b.length<YP.v4bMax){const w=Y.v4.shift();w.tz=0;Y.v4b.push(w);Y.lastPush.v4=true;Y.lastPush.v4b=true;addLog('TR42',w,'Trainard 42 : tête de voie 4 → voie 4b, attente du transbordeur 3','Voie 4b');moved=true}
+  const head=Y.v4[0]&&!Y.v4[0].pre?Y.v4[0]:null;
+  let choice=null,brk='';
+  const psOk=!!psW&&!!Y.psIn&&!Y.ps.includes(null); // le pré-séchoir garde toujours ses wagons : la sortie n'a lieu que si le remplaçant attend déjà à l'entrée (déposé par le transbordeur 3)
+  if(head&&head.line===exp)choice='v4';else if(psOk&&psW.line===exp)choice='ps';
+  else if(!YP.v4Strict){if(head)choice='v4';else if(psOk)choice='ps'}
+  else if(head){choice='v4';brk=`alternance impossible : aucun wagon ligne ${exp} en tête de voie 4 ni en sortie du pré-séchoir`}
   if(Y.t1w){if(!canAccept('pf')){Y.bloc='Sortie du four occupée : le transbordeur 3 doit libérer la voie 6.';return 'bloc'}
     const w=Y.t1w;Y.t1w=null;Y.flash.t1=1.5;addLog('T1',w,'Transbordeur 1 → entrée préfour (fin du compte à rebours)','Voie 6 préfour');insertInto('pf',w);moved=true}
+  if(!trOn(55)&&!Y.t1w){const a=Y.en;let li=-1;for(let i=a.length-1;i>=0;i--)if(a[i]){li=i;break}
+    if(li===a.length-1&&canAccept('pf')){const w=a[li];for(let i=li;i>0;i--)a[i]=a[i-1];a[0]=null;w.tz=0;Y.t1w=w;Y.flash.t1=1.5;addLog('T1',w,'Engobage → transbordeur 1 (trainard 55 à l’arrêt : le séchoir ne sort pas)','Voie 5 → voie 6');moved=true}}
+  if(choice!=null&&!trOn(55)&&!Y.se.includes(null))choice=null; // trainard 55 à l'arrêt : le séchoir ne sort pas, il n'est donc pas alimenté
   if(choice!=null){
     if(!canAccept('se')){Y.bloc='Sortie du four occupée : le transbordeur 3 doit libérer la voie 6.';return 'bloc'}
     let fed;
     let lg;if(choice==='ps'){fed=psW;Y.ps[pi]=null;for(let i=pi;i>0;i--)Y.ps[i]=Y.ps[i-1];Y.ps[0]=Y.psIn;Y.psIn.tz=0;addLog('T3',Y.psIn,'Entrée pré-séchoir (remplace le wagon sortant)','Voie 5b pré-séchoir');Y.psIn=null;Y.flash.t4=1.5;lg=['Pré-séchoir → séchoir','Voie 5b → séchoir']}
-    else{fed=Y.v4.splice(choice,1)[0];Y.lastPush.v4=true;Y.flash.t4=1.5;lg=['Entrée séchoir direct (sans pré-séchoir)','Voie 4 → séchoir']}
+    else{fed=Y.v4.shift();Y.lastPush.v4=true;Y.flash.t4=1.5;lg=['Entrée séchoir direct (sans pré-séchoir)'+(brk?' · '+brk:''),'Voie 4 → séchoir']}
     Y.seqNext=fed.line==='A'?'B':'A';insertInto('se',fed);addLog('T4',fed,lg[0],lg[1]);moved=true;
   }
-  // remplissage du pré-séchoir par la voie 4b (wagons PS)
-  const k=Y.v4.findIndex(w=>w.pre);
-  if(k>=0&&Y.v4b.length<YP.v4bMax){const w=Y.v4.splice(k,1)[0];w.tz=0;Y.v4b.push(w);Y.lastPush.v4=true;Y.lastPush.v4b=true;addLog('TR42',w,'Trainard 42 : voie 4 → voie 4b, attente du transbordeur 3','Voie 4b');moved=true}
   Y.bloc='';
   {const cs=cadSec();addLog('PS',null,`Poussée (consigne ${Math.floor(cs/60)} min ${String(cs%60).padStart(2,'0')} s${Y.catchLeft?' · rattrapage':''})${moved?'':' · aucun wagon à pousser'}`,'Voies 4, 5 et 6')}
   return moved?'ok':'vide';
 }
 const NEXT={ps:null,se:'en',en:'t1',t1:'pf',pf:'sa',sa:'fo',fo:'fx'};
-function canAccept(k){if(k==='fx')return Y.fx.length<YP.fxMax;if(k==='t1')return !Y.t1w||canAccept('pf');if(!k)return false;const a=Y[k];return a.includes(null)||canAccept(NEXT[k])}
+function canAccept(k){if(k==='fx')return Y.fx.length<YP.fxMax;if(k==='se')return Y.se.includes(null)||(trOn(55)&&canAccept('en'));if(k==='t1')return !Y.t1w||canAccept('pf');if(!k)return false;const a=Y[k];return a.includes(null)||canAccept(NEXT[k])}
 // voie 6 : préfour + sas + four forment un seul train poussé d'un bloc (pas de trou entre les zones)
 const V6=['pf','sa','fo'];
 function v6view(){const r=[];for(const k of V6)Y[k].forEach((_,i)=>r.push([k,i]));return r}
@@ -1127,19 +1208,22 @@ function yardStep(dt){
   // déchargement : un wagon à la fois par voie ; vide, il avance vers le chargement
   for(const v of [1,3]){const D=Y.D[v],w=D[0];if(!w)continue;
     if(w.loaded){if(!w.hold)w.dt=(w.dt||0)+dt;if(w.dt>=depT(w)){w.loaded=false;w.sup=0;w.dt=0;w.dx=0;w.hold=false;addLog('DE',w,'Fin de déchargement',`Voie ${v} déchargement`)}}
-    if(!w.loaded){if(YP.mMax>0&&Y.M[v].length<YP.mMax){D.shift();w.tz=0;Y.M[v].push(w);Y.mv.push({uid:w.uid,pts:[[647,VY[v]],[mPos(v,Y.M[v].length-1),VY[v]]],t:0,dur:8,tr:v===1?11:31});addLog('DE',w,'Wagon déchargé → attente entre déchargement et chargement',`Voie ${v}`)}
+    if(!w.loaded&&trOn(v===1?11:31)){if(YP.mMax>0&&Y.M[v].length<YP.mMax){D.shift();w.tz=0;Y.M[v].push(w);Y.mv.push({uid:w.uid,pts:[[647,VY[v]],[mPos(v,Y.M[v].length-1),VY[v]]],t:0,dur:8,tr:v===1?11:31});addLog('DE',w,'Wagon déchargé → attente entre déchargement et chargement',`Voie ${v}`)}
       else if(!YP.mMax&&Y.E[v].length<YP['e'+v]){D.shift();w.tz=0;Y.E[v].push(w);Y.mv.push({uid:w.uid,pts:[[647,VY[v]],[ePos(v,Y.E[v].length-1),VY[v]]],t:0,dur:8,tr:v===1?11:31});addLog('DE',w,'Wagon vide poussé vers le chargement',`Voie ${v}`)}}}
+  // cadence fixe de production : un wagon chargé toutes les N minutes
+  for(const L of ['A','B']){if(!YP['ptOn'+L]||YP['stop'+L])continue;const T=Math.max(1,YP['pt'+L])*60;Y.pt[L]=Math.min(T,(Y.pt[L]||0)+dt);
+    if(Y.pt[L]>=T){const ln=LINES.find(l=>l.id===L),sv=[CUR,S,P];CUR=ln;S=ln.S;P=ln.P;const ok=parkWagon(capWag());[CUR,S,P]=sv;if(ok){Y.pt[L]=0;ln.S.c.wagons=(ln.S.c.wagons||0)+1}}}
   // mise en place du nouveau wagon vide au chargement dès qu'une place se libère
-  for(const v of [1,3]){const M=Y.M[v];if(M[0]&&!Y.mv.some(m=>m.uid===M[0].uid)&&Y.E[v].length<YP['e'+v]){const w=M.shift();w.tz=0;Y.E[v].push(w);Y.mv.push({uid:w.uid,pts:[[MX0,VY[v]],[ePos(v,Y.E[v].length-1),VY[v]]],t:0,dur:6,tr:v===1?14:34});addLog('CH',w,'Nouveau wagon vide mis en place au chargement',`Voie ${v} chargement`)}}
+  for(const v of [1,3]){const M=Y.M[v];if(M[0]&&trOn(v===1?14:34)&&!Y.mv.some(m=>m.uid===M[0].uid)&&Y.E[v].length<YP['e'+v]){const w=M.shift();w.tz=0;Y.E[v].push(w);Y.mv.push({uid:w.uid,pts:[[MX0,VY[v]],[ePos(v,Y.E[v].length-1),VY[v]]],t:0,dur:6,tr:v===1?14:34});addLog('CH',w,'Nouveau wagon vide mis en place au chargement',`Voie ${v} chargement`)}}
   if(YP.cadOn){Y.cadT+=dt;if(Y.cadT>=cadSec()){const r=pushCad();if(r==='bloc')Y.cadT=cadSec();else{Y.cadT=0;if(Y.catchLeft>0){Y.catchLeft--;if(!Y.catchLeft)addLog('OP',null,'Fin du rattrapage, retour à la consigne normale','Voies 4, 5 et 6','Poste')}}}}
   // transbordeur 2 : wagon chargé (voies 1 et 3 en alternance) → voie 4
   const T2=Y.T2;
   const multi=Y.anim&&Y.anim.track&&Y.anim.t<animDur();
-  if(T2.ph==='move'){T2.p=Math.min(multi?1:9,T2.p+dt/YP.tMan);if(T2.p>=1&&!multi){T2.w.tz=0;Y.v4.push(T2.w);Y.flash.tr[41]=3;T2.seq.push(T2.line);if(T2.seq.length>12)T2.seq.shift();addLog('T2',T2.w,`Transfert ligne ${T2.line} (voie ${T2.from}) → voie 4 · prochain : ligne ${T2.next}`,'Voie 4');T2.w=null;T2.ph='idle';T2.p=0}}
+  if(T2.ph==='move'){T2.p=Math.min(multi||!trOn(41)?1:9,T2.p+dt/YP.tMan);if(T2.p>=1&&!multi&&trOn(41)){T2.w.tz=0;Y.v4.push(T2.w);Y.flash.tr[41]=3;T2.seq.push(T2.line);if(T2.seq.length>12)T2.seq.shift();addLog('T2',T2.w,`Transfert ligne ${T2.line} (voie ${T2.from}) → voie 4 · prochain : ligne ${T2.next}`,'Voie 4');T2.w=null;T2.ph='idle';T2.p=0}}
   else if(YP.manOn&&Y.v4.length<YP.v4Max&&!multi){ // pendant une avance de plusieurs pas, la voie 4 n'est pas réalimentée
     // ordre d'entrée sur la voie 4 : A, B, A, B… ou B, A, B, A…
     const want=T2.next||YP.v4Start,other=want==='A'?'B':'A',vOf=L=>L==='A'?YP.exA:YP.exB;
-    const pick=L=>{const v=vOf(L),i=Y.E[v].findIndex(x=>x.loaded);return i>=0?{v,i,L}:null};
+    const pick=L=>{const v=vOf(L);if(!trOn(v===1?14:34))return null;const i=Y.E[v].findIndex(x=>x.loaded);return i>=0?{v,i,L}:null};
     let p=pick(want),sub='';
     if(!p){const o=pick(other);if(o){const full=Y.E[o.v].filter(x=>x.loaded).length>=YP.acc;
       if(!YP.v4Strict){sub=YP['stop'+want]?`ligne ${want} à l’arrêt`:full?`${YP.acc} wagons accumulés ligne ${other}`:`pas de wagon prêt ligne ${want}`;p=o}}} // ordre strict : jamais AA ni BB sur la voie 4
@@ -1159,9 +1243,9 @@ const lum=c=>{const n=parseInt(c.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255
 const txtOn=c=>lum(c)>.55?'#1A2430':'#FFFFFF';
 function switchTo(k){
   const g=id=>document.getElementById(id);
-  ['A','B','voies'].forEach(t=>g('tab-'+t).setAttribute('aria-selected',String(t===k)));
-  g('pageVoies').hidden=k!=='voies';g('pageLigne').hidden=k==='voies';
-  if(k!=='voies'){const ln=LINES.find(l=>l.id===k);if(ln!==ACT){if(openId)closeM();ACT=CUR=ln;S=ln.S;P=ln.P;lastChip={};syncPanel();buildRates();updateMeas();updateKpi();updTeach();updT3();updateChips(render())}}
+  ['A','B','voies','ref','plan'].forEach(t=>g('tab-'+t).setAttribute('aria-selected',String(t===k)));
+  g('pageVoies').hidden=k!=='voies';g('pageRef').hidden=k!=='ref';g('pagePlan').hidden=k!=='plan';g('pageLigne').hidden=k==='voies'||k==='ref'||k==='plan';
+  if(k==='ref'){renderRefs()}else if(k==='plan'){renderPlan(true)}else if(k!=='voies'){const ln=LINES.find(l=>l.id===k);if(ln!==ACT){if(openId)closeM();ACT=CUR=ln;S=ln.S;P=ln.P;lastChip={};syncPanel();buildRates();updateMeas();updateKpi();updTeach();updT3();updateChips(render())}}
   else renderYard(true);
   try{history.replaceState(null,'','#'+k)}catch(e){}
 }
@@ -1172,6 +1256,7 @@ const seZone=i=>{const n=Y.se.length;return Math.min(YP.seZones,1+Math.floor(i*Y
 let wEdit=null,wColSel=null,wRetSel=1;
 function openW(uid){
   const w=allW().find(x=>x.uid===uid);if(!w)return;wEdit=w;wColSel=w.color;wRetSel=w.ret;
+  {const sel=document.getElementById('wRef');sel.innerHTML='<option value="">Référence de la ligne</option>'+RF.refs.map(r=>`<option value="${r.code}"${w.ref===r.code?' selected':''}>${r.code} · ${r.h} couches, ${r.l} par ${r.l}</option>`).join('')}
   const g=id=>document.getElementById(id);
   g('wT').textContent='Wagon n° '+no3(w.no);g('wDep').value=w.tDep||YP.tDep;{const inD=[1,3].some(v=>Y.D[v].includes(w));g('wDepNow').hidden=!(inD&&w.loaded);g('wDepLeft').textContent=inD&&w.loaded&&w.dt?`reste ${cd(depLeft(w))}`:''}g('wPre').checked=!!w.pre;g('wNo').value=w.no;g('wCol').value=w.color;g('wErr').hidden=true;
   g('wInfo').textContent=`${w.loaded?`Chargé (ligne ${w.line}, ${fmt(w.sup,0)} supports)`:'Vide'} · ${whereW(w)}`;
@@ -1210,7 +1295,7 @@ function drawStatic(){
   s.push(`<rect class="zbox" data-zone="fo" x="300" y="${VY[6]-32}" width="640" height="64" fill="var(--hmi-red)"><title>Modifier les wagons du four</title></rect>`);s.push(`<text x="620" y="${VY[6]-20}" text-anchor="middle" style="font-size:10.5px;font-weight:600;fill:#fff">Four</text>`);
   // trainards
   [[14,392,VY[1]+26],[11,744,VY[1]+26],[34,392,VY[3]+26],[31,744,VY[3]+26],[41,318,VY[4]+26],[42,1000,VY[4]+26],[55,200,VY[5]+18]].forEach(([n,x,y])=>{
-    s.push(`<rect id="tr${n}" x="${x}" y="${y}" width="18" height="6" rx="1" fill="var(--hmi-tr-off)"/>`);if(n===55)T(x+22,y+7,'Trainard '+n,'start',9.5);else T(x+9,y+18,'Trainard '+n,'middle',9.5)});
+    s.push(`<rect id="tr${n}" x="${x}" y="${y}" width="18" height="6" rx="1" fill="var(--hmi-tr-off)"/><text id="tra${n}" x="${x-3}" y="${y+6.5}" text-anchor="end" style="font-size:11px;font-weight:700;fill:var(--hmi-tr)"></text><text id="trs${n}" x="${x+9}" y="${y-3}" text-anchor="middle" style="font-size:8px;font-weight:700;fill:#C62828"></text>`);s.push(`<rect class="trhit" data-tr="${n}" x="${x-16}" y="${y-12}" width="${n===55?120:56}" height="${n===55?22:32}" fill="transparent" tabindex="0" role="button" aria-label="Trainard ${n} : marche ou arrêt"><title>Trainard ${n} : toucher pour l’arrêter ou le remettre en marche</title></rect>`);if(n===55)T(x+22,y+7,'Trainard '+n,'start',9.5);else T(x+9,y+18,'Trainard '+n,'middle',9.5)});
   // zones cliquables des voies
   const hit=(z,x,y,w,hh,t)=>s.push(`<rect class="zhit" data-zone="${z}" x="${x}" y="${y}" width="${w}" height="${hh}" tabindex="0" role="button" aria-label="${t}"><title>${t}</title></rect>`);
   hit('v2',50,VY[2]-15,202,30,'Voie 2 : ajouter ou modifier des wagons');
@@ -1224,7 +1309,7 @@ function drawStatic(){
 // positions des wagons
 function wagPos(){
   const L=[];const add=(w,x,y,zc,lab)=>{if(w)L.push([w,x,y,zc,lab])};
-  [1,3].forEach(v=>{Y.E[v].forEach((w,k)=>add(w,ePos(v,k),VY[v],'E'));Y.M[v].forEach((w,k)=>add(w,mPos(v,k),VY[v],'E'));Y.D[v].forEach((w,k)=>add(w,647+k*24,VY[v],w.loaded?'D':'E',k===0?(w.loaded?(w.hold?'\u0001':'')+cd(depLeft(w)):(Y.E[v].length>=YP['e'+v]?'attente':'→ ch.')):(w.loaded?(w.tDep||YP.tDep)+'′':'')))});
+  [1,3].forEach(v=>{const fe=Y.E[v].find(x=>!x.loaded);Y.E[v].forEach((w,k)=>add(w,ePos(v,k),VY[v],'E',w===fe&&!YP['stop'+lineOf(v)]?'en charge':null));Y.M[v].forEach((w,k)=>add(w,mPos(v,k),VY[v],'E'));Y.D[v].forEach((w,k)=>add(w,647+k*24,VY[v],w.loaded?'D':'E',k===0?(w.loaded?(w.hold?'\u0001':'')+cd(depLeft(w)):(Y.E[v].length>=YP['e'+v]?'attente':'→ ch.')):(w.loaded?(w.tDep||YP.tDep)+'′':'')))});
   Y.v2.forEach((w,k)=>add(w,232-k*24,VY[2],'v2'));
   const n4=Y.v4.length,sp4=Math.min(23,560/Math.max(1,n4));Y.v4.forEach((w,k)=>add(w,872-k*sp4,VY[4],'v4'));
   const evac=()=>YP.cadOn?(Y.bloc?'bloqué':cd(Math.max(0,cadSec()-Y.cadT))):'arrêt';
@@ -1239,7 +1324,12 @@ const wagSvg=(w,x,y,zc,lab)=>{const stp=!!lab&&lab[0]==='\u0001';if(stp)lab=lab.
 function drawDyn(){
   const s=[],f=Y.flash;
   let y4=VY[5],y1=VY[6],y3a=null;
-  if(Y.anim&&Y.anim.t<animDur())for(const uid in Y.anim.paths){const p=animAt(Number(uid));if(!p)continue;if(Math.abs(p[0]-905)<2)y4=p[1];if(Math.abs(p[0]-65)<2)y1=p[1];if(Math.abs(p[0]-1060)<2)y3a=p[1]}
+  if(Y.anim&&Y.anim.t<animDur())for(const uid in Y.anim.paths){const p=animAt(Number(uid));if(!p)continue;
+    {const A=Y.anim,k=A.track?Math.min(A.paths[uid].length-1,Math.floor(A.t/A.sd)):0,pp=A.track?A.paths[uid][k]:A.paths[uid];if(!pp||pp.length<2)continue;
+     const f=e(Math.min(1,A.track?(A.t-k*A.sd)/A.sd:A.t/ANIM));let tot=0;const L=[0];for(let i=1;i<pp.length;i++){tot+=Math.hypot(pp[i][0]-pp[i-1][0],pp[i][1]-pp[i-1][1]);L.push(tot)}const sNow=f*tot;
+     for(let i=1;i<pp.length;i++){const a=pp[i-1],b=pp[i];if(Math.abs(a[0]-b[0])>.5||a[1]===b[1])continue; // segment vertical = trajet sur un transbordeur
+       const y=sNow<=L[i-1]?a[1]:sNow>=L[i]?b[1]:p[1]; // le transbordeur attend le wagon au niveau de prise, le porte, puis reste au niveau de dépose
+       if(Math.abs(a[0]-905)<2)y4=y;else if(Math.abs(a[0]-65)<2)y1=y;else if(Math.abs(a[0]-1060)<2)y3a=y}}}
   // transbordeur 2
   const T2=Y.T2;let y2=VY[4];if(T2.ph==='move'){const e2=e(Math.min(1,T2.p*1.6)),yA=VY[T2.from];y2=T2.p<.6?yA+(VY[4]-yA)*e2:VY[4]}
   s.push(`<rect x="254" y="${y2-17}" width="36" height="34" fill="var(--hmi-car)"/>`);if(T2.w&&T2.p<.6)s.push(wagSvg(T2.w,272,y2,'E'));
@@ -1249,16 +1339,19 @@ function drawDyn(){
   // transbordeurs 4 et 1 (pendant les poussées)
 s.push(`<rect x="887" y="${y4-17}" width="36" height="34" fill="var(--hmi-car)"/>`);
   s.push(`<rect x="47" y="${y1-17}" width="36" height="34" fill="var(--hmi-car)"/>`);
+  {const C=drawDyn.cy||(drawDyn.cy={}),ar=(k,x,y)=>{const p=C[k];C[k]=y;if(p==null||Math.abs(p-y)<.15)return;s.push(`<text x="${x}" y="${y+4}" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--hmi-tr)">${y<p?'▲':'▼'}</text>`)};ar('t1',65,y1);ar('t4',905,y4);ar('t2',272,y2);ar('t3',1060,y3)}
   { const left=YP.cadOn?(Y.bloc?'évacuation bloquée':'évacuation dans '+cd(Math.max(0,cadSec()-Y.cadT))):'poussée à l’arrêt';
     s.push(`<rect x="88" y="${VY[5]+36}" width="100" height="15" rx="3" fill="#FFFFFF" stroke="var(--hmi-pur)" stroke-width="1"/><text x="138" y="${VY[5]+47}" text-anchor="middle" style="font-size:9.5px;font-weight:700">${left}</text>`); }
   if(Y.find&&Y.find.t>0){const hit=wagPosAnim().find(a=>a[0].uid===Y.find.uid);if(hit)s.push(`<circle cx="${hit[1].toFixed(1)}" cy="${hit[2]}" r="${(26+4*Math.sin(Y.find.t*6)).toFixed(1)}" fill="none" stroke="#E3622A" stroke-width="3"/>`)}
   document.getElementById('ydyn').innerHTML=s.join('');
-  { const TRX={14:392,11:744,34:392,31:744,41:318,42:1000,55:200},on={},xs={};
+  { const TRX={14:392,11:744,34:392,31:744,41:318,42:1000,55:200},on={},xs={},dir={41:1,42:1,55:-1,14:-1,34:-1,11:-1,31:-1};
     for(const n in TRX){on[n]=(f.tr[n]||0)>0;xs[n]=TRX[n]}
     if(Y.T2.ph==='move'&&Y.T2.p<.6){on[Y.T2.from===1?14:34]=true}
-    for(const m of Y.mv){const p=mvAt(m.uid);if(p&&m.tr){on[m.tr]=true;xs[m.tr]=p[0]+12}}
+    for(const m of Y.mv){const p=mvAt(m.uid);if(p&&m.tr){on[m.tr]=true;xs[m.tr]=p[0]+12;dir[m.tr]=Math.sign(m.pts[1][0]-m.pts[0][0])||-1}}
     if(Y.tr55&&Y.anim&&Y.anim.t<animDur()){const p=animAt(Y.tr55);if(p){on[55]=true;xs[55]=p[0]+11}}
-    for(const n in TRX){const el=document.getElementById('tr'+n);if(el){el.setAttribute('fill',on[n]?'var(--hmi-tr)':'var(--hmi-tr-off)');el.setAttribute('x',xs[n])}} }
+    for(const n in TRX){const el=document.getElementById('tr'+n),off=!trOn(n);if(!el)continue;const mv=on[n]&&!off;el.setAttribute('fill',off?'#C62828':mv?'var(--hmi-tr)':'var(--hmi-tr-off)');el.setAttribute('x',xs[n]);
+      const a=document.getElementById('tra'+n);if(a){a.textContent=mv?(dir[n]>0?'►':'◄'):'';a.setAttribute('x',dir[n]>0?xs[n]+30:xs[n]-3);a.setAttribute('text-anchor',dir[n]>0?'start':'end')}
+      const t=document.getElementById('trs'+n);if(t){t.textContent=off?'ARRÊT':'';t.setAttribute('x',xs[n]+9)}} }
 }
 function buildCarto(){
   const F=[['Circuit',[['fleet','Wagons dans le circuit',8,400]]],
@@ -1306,19 +1399,19 @@ function yardInit(){
   g('wSw').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;wColSel=b.dataset.c;g('wCol').value=wColSel;g('wPrev').style.background=wColSel;g('wSw').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
   g('wCol').addEventListener('input',e=>{wColSel=e.target.value;g('wPrev').style.background=wColSel;g('wSw').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'))});
   g('wRet').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;wRetSel=Number(b.dataset.ret);g('wRet').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
-  g('wOk').addEventListener('click',()=>{if(!wEdit)return;const n=Math.round(Number(g('wNo').value));
+  g('wOk').addEventListener('click',()=>{if(!wEdit)return;const w0col=wEdit.color;const n=Math.round(Number(g('wNo').value));
     if(!(n>=1&&n<=999)){g('wErr').textContent='Entrez un numéro de wagon entre 1 et 999.';g('wErr').hidden=false;return}
     {const o=allW().find(x=>x!==wEdit&&x.no===n);if(o){g('wErr').innerHTML=`Le numéro ${no3(n)} est déjà porté par un autre wagon (${whereW(o)}). <button class="btn" type="button" id="wSwap">Échanger les numéros ${no3(wEdit.no)} ↔ ${no3(n)}</button>`;g('wErr').hidden=false;
       g('wSwap').onclick=()=>{const old=wEdit.no;o.no=old;wEdit.no=n;addLog('OP',wEdit,`Numéros échangés avec le wagon ${no3(old)}`,whereW(wEdit),'Poste');closeW();renderYard(true);stSave()};return}}
-    const old=wEdit.no;wEdit.tDep=Math.max(1,Math.min(600,Math.round(Number(g('wDep').value)||YP.tDep)));wEdit.no=n;wEdit.color=wColSel||wEdit.color;wEdit.pre=g('wPre').checked;wEdit.ret=wRetSel;if(n>Y.no)Y.no=n;
+    const old=wEdit.no;wEdit.tDep=Math.max(1,Math.min(600,Math.round(Number(g('wDep').value)||YP.tDep)));wEdit.no=n;wEdit.color=wColSel||wEdit.color;wEdit.pre=g('wPre').checked;wEdit.ret=wRetSel;{const rc=g('wRef').value;wEdit.ref=rc||null;const rr=rc&&refByCode(rc);if(rr&&!wEdit.ser)wEdit.color=wColSel&&wColSel!==w0col?wColSel:rr.col}if(n>Y.no)Y.no=n;
     addLog('OP',wEdit,old!==n?`Wagon renuméroté (ancien ${no3(old)})`:'Wagon modifié',whereW(wEdit),'Poste');closeW();renderYard(true)});
   g('wDepNow').addEventListener('click',()=>{if(!wEdit)return;wEdit.dt=depT(wEdit);addLog('OP',wEdit,'Déchargement terminé manuellement',whereW(wEdit),'Poste');closeW();renderYard(true)});
   g('wCancel').addEventListener('click',closeW);g('wX').addEventListener('click',closeW);
   g('wmodal').addEventListener('click',ev=>{if(ev.target.id==='wmodal')closeW()});
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&wEdit)closeW()});
   g('wNo').addEventListener('keydown',ev=>{if(ev.key==='Enter')g('wOk').click()});
-  ['A','B','voies'].forEach(t=>g('tab-'+t).addEventListener('click',()=>switchTo(t)));
-  const hs=location.hash.slice(1);if(hs==='voies'||hs==='B')switchTo(hs);
+  ['A','B','voies','ref','plan'].forEach(t=>g('tab-'+t).addEventListener('click',()=>switchTo(t)));refInit();planInit();
+  const hs=location.hash.slice(1);if(['voies','B','ref','plan'].includes(hs))switchTo(hs);
 }
 /* --- éditeur de zone : tunnels (pré-séchoir, séchoir, engobage, préfour, four) et voies (1, 2, 3, 4, 6) --- */
 const zEd={k:null,sel:null,col:null};
@@ -1371,7 +1464,7 @@ function adjInit(){
     addLog('OP',null,`Avance manuelle de ${k} pas`,'Voies 4, 5 et 6','Poste');renderYard(true)};
   g('adjPush').addEventListener('click',()=>push(1));
   g('adjFwd').addEventListener('click',()=>push(Math.max(1,Math.min(50,Math.round(Number(g('adjN').value)||1)))));
-  const advDep=v=>{const D=Y.D[v],w=D[0];if(!w)return `Aucun wagon au déchargement de la voie ${v}.`;
+  const advDep=v=>{const D=Y.D[v],w=D[0];if(!w)return `Aucun wagon au déchargement de la voie ${v}.`;if(!trOn(v===1?11:31))return `Le trainard ${v===1?11:31} est à l’arrêt : touchez-le pour le remettre en marche.`;
     if(w.loaded){w.loaded=false;w.sup=0;w.dt=0;w.dx=0;w.hold=false;addLog('OP',w,'Déchargement terminé manuellement · avance',`Voie ${v} déchargement`,'Poste')}
     const nx=()=>D[0]?` Le wagon ${no3(D[0].no)} passe au déchargement (${D[0].loaded?cd(depLeft(D[0])):'vide'}).`:'';
     if(YP.mMax>0&&Y.M[v].length<YP.mMax){D.shift();w.tz=0;Y.M[v].push(w);Y.mv.push({uid:w.uid,pts:[[647,VY[v]],[mPos(v,Y.M[v].length-1),VY[v]]],t:0,dur:6,tr:v===1?11:31});addLog('DE',w,'Wagon déchargé → attente entre déchargement et chargement',`Voie ${v}`);stSave();return `Wagon ${no3(w.no)} déchargé et avancé vers les vides en attente.`+nx()}
@@ -1534,7 +1627,7 @@ function pushesToKilnExit(w){
 function fmtEta(pushes){if(pushes==null)return '—';const s=(pushes-1)*cadSec()+Math.max(0,cadSec()-Y.cadT);const d=new Date(simDate().getTime()+s*1000);
   const days=Math.floor((d-new Date(simDate().toDateString()))/864e5);return `${pushes} poussée${pushes>1?'s':''} · dans ${s<3600?cd(s):hmS(s)} (${days>0?(days===1?'demain ':'dans '+days+' jours '):''}vers ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})})`}
 function infoRows(w){
-  const r=[['Emplacement',whereW(w)],['État',w.loaded?`chargé · ${fmt(w.sup,0)} supports`:'vide'],['Ligne',w.line?'Ligne '+w.line:'—'],['Pré-séchoir',w.pre?'oui (PS)':'non'],
+  const r=[['Emplacement',whereW(w)],['État',w.loaded?`chargé · ${fmt(w.sup,0)} supports`:'vide'],['Ligne',w.line?'Ligne '+w.line:'—'],...(w.ref||refOf(w.line||'')?[['Référence support',(()=>{const r=RF.refs.find(x=>x.code===w.ref);const rr=r||refOf(w.line||'');return rr?`${rr.code} · ${rr.h} couches posées ${rr.l} par ${rr.l}${r?'':' (référence de la ligne)'}`:w.ref})()]]:[]),['Pré-séchoir',w.pre?'oui (PS)':'non'],
     ['Code couleur',`<span class="wsw" style="display:inline-block;vertical-align:middle;background:${w.color}"></span>${w.ser?` · série : wagon ${w.ser.i} sur ${w.ser.n}`:''}`],['Temps dans la zone',hmS(w.tz||0)],
     ['Voie de déchargement',`voie ${w.ret} (ligne ${lineOf(w.ret)})`],['Temps de déchargement',`${w.tDep||YP.tDep} min${w.dx?` + ${w.dx} min ajoutées`:''}`]];
   const inD=[1,3].find(v=>Y.D[v].includes(w));
@@ -1623,7 +1716,11 @@ function serInit(){
   const g=id=>document.getElementById(id),cur={A:'#C8372D',B:'#C8372D'};
   const sw=(el,sel,on)=>{el.innerHTML=SW.map(c=>`<button type="button" class="swb" data-c="${c}" style="background:${c}" aria-label="Couleur ${c}" aria-pressed="${c===sel}"></button>`).join('');el.onclick=ev=>{const b=ev.target.closest('[data-c]');if(b)on(b.dataset.c)}};
   const draw=L=>sw(g('serC'+L),cur[L],c=>{cur[L]=c;draw(L)});
-  ['A','B'].forEach(L=>{draw(L);
+  ['A','B'].forEach(L=>{
+    g('pt'+L).addEventListener('change',e=>{YP['pt'+L]=Math.max(1,Math.min(600,Math.round(Number(e.target.value)||15)));Y.pt[L]=Math.min(Y.pt[L]||0,YP['pt'+L]*60);ysave();ptStatus();stSave()});
+    g('ptM'+L).addEventListener('click',ev=>{const b=ev.target.closest('[data-pm]');if(!b)return;const on=Number(b.dataset.pm);if(on===YP['ptOn'+L])return;YP['ptOn'+L]=on;Y.pt[L]=0;ysave();
+      addLog('OP',null,on?`Ligne ${L} : cadence fixe, 1 wagon toutes les ${YP['pt'+L]} min`:`Ligne ${L} : production par les machines`,`Ligne ${L}`,'Poste');ptStatus();stSave()});
+    draw(L);
     g('serGo'+L).addEventListener('click',()=>{const n=Math.max(1,Math.min(200,Math.round(Number(g('serN'+L).value)||0))),k=Math.max(0,Math.min(n,Math.round(Number(g('serK'+L).value)||0)));
       const id=Date.now()%1e7,done=recentOf(L).slice(0,k).reverse();done.forEach((w,i)=>{w.color=cur[L];w.ser={id,i:i+1,n}});
       Y.ser[L]=k<n?{id,n,done:done.length,color:cur[L]}:null;
@@ -1631,10 +1728,17 @@ function serInit(){
       g('serMsg').textContent=`Série ligne ${L} lancée : ${done.length} wagon(s) déjà fait(s) mis en couleur${done.length<k?` (seulement ${done.length} wagon(s) chargé(s) trouvés sur la ligne ${L})`:''}, les ${n-done.length} suivants seront colorés au chargement.`;renderYard(true);stSave()});
     g('serEnd'+L).addEventListener('click',()=>{if(!Y.ser[L])return;addLog('OP',null,`Série ligne ${L} arrêtée à ${Y.ser[L].done}/${Y.ser[L].n}`,`Ligne ${L}`,'Poste');Y.ser[L]=null;g('serMsg').textContent=`Série ligne ${L} arrêtée. Les wagons déjà colorés gardent leur couleur.`;renderYard(true);stSave()})});
   // couleur pour la sélection multiple
+  const rOpt=()=>{g('selRef').innerHTML='<option value="">Référence de la ligne</option>'+RF.refs.map(r=>`<option value="${r.code}">${r.code} · ${r.h} couches, ${r.l} par ${r.l}</option>`).join('')};rOpt();g('selBtn').addEventListener('click',rOpt);
+  g('selRefGo').addEventListener('click',()=>{const ws=allW().filter(w=>SEL.has(w.uid));if(!ws.length)return selUpd('Sélectionnez d’abord des wagons sur la carte.');const rc=g('selRef').value,rr=refByCode(rc);
+    ws.forEach(w=>{w.ref=rc||null;if(rr&&!w.ser)w.color=rr.col});addLog('OP',null,`Référence ${rc||'de la ligne'} pour ${ws.length} wagon(s) : ${ws.map(w=>no3(w.no)).join(', ')}`,'Sélection multiple','Poste');
+    selUpd(`${ws.length} wagon(s) : référence ${rc||'de la ligne'}. La ligne la lira automatiquement en préparant chaque wagon.`);renderYard(true);stSave()});
   let sc=null;const selDraw=()=>sw(g('selCol'),sc,c=>{sc=c;const ws=allW().filter(w=>SEL.has(w.uid));if(!ws.length){selDraw();return selUpd('Sélectionnez d’abord des wagons sur la carte.')}
     ws.forEach(w=>{w.color=c});addLog('OP',null,`Couleur appliquée à ${ws.length} wagon(s) : ${ws.map(w=>no3(w.no)).join(', ')}`,'Sélection multiple','Poste');selUpd(`${ws.length} wagon(s) mis à la même couleur.`);selDraw();renderYard(true);stSave()});selDraw();
 }
-function serStatus(){const g=id=>document.getElementById(id);['A','B'].forEach(L=>{const e=g('serS'+L);if(!e)return;const r=Y.ser&&Y.ser[L];
+function ptStatus(){const g=id=>document.getElementById(id);['A','B'].forEach(L=>{const e=g('ptS'+L);if(!e)return;const on=!!YP['ptOn'+L],T=Math.max(1,YP['pt'+L])*60,left=T-(Y.pt[L]||0);
+  g('ptM'+L).querySelectorAll('[data-pm]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.pm)===(on?1:0))));const i=g('pt'+L);if(document.activeElement!==i)i.value=YP['pt'+L];
+  const lw=lineWagons(L);e.textContent=!on?'production simulée par les machines de la ligne':YP['stop'+L]?'ligne à l’arrêt':left<=0.01&&!lw.up.length?'wagon prêt · attente d’un wagon vide au chargement':`prochain wagon chargé dans ${cd(left)}${lw.up[0]?' (n° '+no3(lw.up[0].no)+')':''}`})}
+function serStatus(){ptStatus();const g=id=>document.getElementById(id);['A','B'].forEach(L=>{const e=g('serS'+L);if(!e)return;const r=Y.ser&&Y.ser[L];
   e.innerHTML=r?`<span class="wsw" style="display:inline-block;vertical-align:middle;background:${r.color}"></span> en cours : <strong>${r.done}/${r.n}</strong> · reste ${r.n-r.done}`:'aucune série en cours'})}
 function prodGroup(w,n){if(!w||!w.loaded||!w.line)return [];const r=recentOf(w.line),i=r.indexOf(w);return i<0?[]:r.slice(i,i+n)}
 function renderProd(){const g=id=>document.getElementById(id),w=allW().find(x=>x.uid===iUid);if(!w)return;const n=Math.max(1,Math.min(100,Math.round(Number(g('pN').value)||1)));
@@ -1643,6 +1747,43 @@ function renderProd(){const g=id=>document.getElementById(id),w=allW().find(x=>x
   const rows=grp.map((x,k)=>{ts+=x.sup||0;const m=x.tDep||YP.tDep;tm+=m;return `<tr><td>${k+1}</td><td><span class="wsw" style="display:inline-block;vertical-align:middle;background:${x.color}"></span> <b>${no3(x.no)}</b></td><td>${whereW(x)}</td><td>${lay}</td><td>${fmt(x.sup||0,0)}</td><td>${m} min</td></tr>`}).join('');
   g('pTab').innerHTML=`<thead><tr><th>#</th><th>Wagon</th><th>Emplacement</th><th>Couches</th><th>Supports</th><th>Déchargement</th></tr></thead><tbody>${rows}<tr style="font-weight:700"><td></td><td>Total ${grp.length} wagons</td><td></td><td>${lay*grp.length}</td><td>${fmt(ts,0)}</td><td>${hmS(tm*60)}</td></tr></tbody>`;
   g('pMsg').textContent=grp.length<n?`Seulement ${grp.length} wagon(s) de la ligne ${w.line} trouvés avant celui-ci dans le circuit.`:`Wagon ${no3(w.no)} et les ${grp.length-1} wagons chargés avant lui sur la ligne ${w.line}.`}
+function renderRefs(){const g=id=>document.getElementById(id);
+  ['A','B'].forEach(L=>{const sel=g('refSel'+L);sel.innerHTML=`<option value="">Aucune (réglages de la ligne)</option>`+RF.refs.map(r=>`<option value="${r.code}"${RF.ln[L]===r.code?' selected':''}>${r.code} · ${r.h} couches, ${r.l} par ${r.l}</option>`).join('');
+    const r=refOf(L);g('refInf'+L).textContent=r?`la pince pose ${r.l} couches à la fois, ${r.h/r.l} prise${r.h/r.l>1?'s':''} par pile · ${r.c*r.h*8} supports par wagon`:''});
+  g('refTab').innerHTML='<thead><tr><th>Référence</th><th>Couches sur le wagon</th><th>Couches par prise</th><th>Colonnes</th><th>Supports / wagon</th><th>Couleur</th><th>Ligne</th><th></th></tr></thead><tbody>'+
+    RF.refs.map((r,i)=>`<tr data-ri="${i}"><td><b>${r.code}</b></td><td><input type="number" class="numin" data-rk="h" min="1" max="20" value="${r.h}" style="width:60px"></td><td><input type="number" class="numin" data-rk="l" min="1" max="10" value="${r.l}" style="width:60px"></td><td><input type="number" class="numin" data-rk="c" min="1" max="10" value="${r.c}" style="width:60px"></td><td>${r.c*r.h*8}</td><td><input type="color" data-rk="col" value="${r.col}"></td><td>${['A','B'].filter(L=>RF.ln[L]===r.code).map(L=>'Ligne '+L).join(', ')||'—'}</td><td><button class="btn" type="button" data-rdel="${i}">Supprimer</button></td></tr>`).join('')+'</tbody>'}
+function refInit(){const g=id=>document.getElementById(id),msg=t=>{g('refMsg').textContent=t};
+  ['A','B'].forEach(L=>g('refSel'+L).addEventListener('change',e=>{RF.ln[L]=e.target.value;rfSave();applyRef(L);const r=refOf(L);
+    addLog('OP',null,r?`Ligne ${L} : référence ${r.code} (${r.h} couches posées ${r.l} par ${r.l})`:`Ligne ${L} : sans référence`,`Ligne ${L}`,'Poste');msg(r?`Ligne ${L} passe en référence ${r.code} : ${r.h} couches sur le wagon, la pince prend et pose ${r.l} couches à la fois.`:`Ligne ${L} : réglages manuels de la ligne.`);renderRefs()}));
+  g('refTab').addEventListener('change',e=>{const t=e.target,tr=t.closest('[data-ri]');if(!tr||!t.dataset.rk)return;const r=RF.refs[Number(tr.dataset.ri)],k=t.dataset.rk;
+    if(k==='col')r.col=t.value;else{const v=Math.max(1,Math.round(Number(t.value)||1));const nr=Object.assign({},r,{[k]:v});if(nr.h%nr.l){g('rfErr').textContent=`Référence ${r.code} : ${nr.h} couches ne se posent pas ${nr.l} par ${nr.l} (le nombre de couches doit être un multiple du nombre par prise).`;renderRefs();return}r[k]=v}
+    g('rfErr').textContent='';rfSave();['A','B'].forEach(L=>{if(RF.ln[L]===r.code)applyRef(L)});renderRefs()});
+  g('refTab').addEventListener('click',e=>{const b=e.target.closest('[data-rdel]');if(!b)return;const r=RF.refs[Number(b.dataset.rdel)];RF.refs.splice(Number(b.dataset.rdel),1);['A','B'].forEach(L=>{if(RF.ln[L]===r.code)RF.ln[L]=''});rfSave();msg(`Référence ${r.code} supprimée.`);renderRefs()});
+  g('rfAdd').addEventListener('click',()=>{const code=g('rfCode').value.trim(),h=Math.round(Number(g('rfH').value)),l=Math.round(Number(g('rfL').value)),c=Math.round(Number(g('rfC').value)),err=t=>{g('rfErr').textContent=t};
+    if(!code)return err('Donnez un nom ou un numéro de référence.');if(RF.refs.some(r=>r.code===code))return err(`La référence ${code} existe déjà.`);
+    if(!(h>=1&&l>=1&&c>=1))return err('Les couches et les colonnes doivent être au moins 1.');if(h%l)return err(`${h} couches ne se posent pas ${l} par ${l} : le nombre de couches doit être un multiple du nombre par prise.`);
+    RF.refs.push({code,h,l,c,col:g('rfCol').value});rfSave();err('');g('rfCode').value='';msg(`Référence ${code} ajoutée : ${h} couches posées ${l} par ${l}. Choisissez-la pour une ligne ci-dessus.`);renderRefs()});
+  ['A','B'].forEach(L=>applyRef(L,false));renderRefs()}
+function renderPlan(force){const g=id=>document.getElementById(id);if(!force&&g('pagePlan').hidden)return;
+  ['A','B'].forEach(L=>{const q=Y.plan[L],o=q[0],ref=c=>refByCode(c),rd=c=>{const r=ref(c);return r?`${r.code} · ${r.h} couches posées ${r.l} par ${r.l}`:c};
+    const step=YP['ptOn'+L]?Math.max(YP['pt'+L]*60,2*cadSec()):2*cadSec();let acc=0;
+    if(!o)g('plCur'+L).innerHTML=`<p class="info" style="margin:0">Aucun ordre en cours : la ligne produit selon la référence du wagon ou de la ligne.</p>`;
+    else{acc=(o.n-o.done)*step;g('plCur'+L).innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="wsw" style="display:inline-block;background:${o.color}"></span><strong>En cours : ${rd(o.ref)}</strong></div>
+      <div style="margin:6px 0;height:10px;background:var(--panel2);border-radius:5px;overflow:hidden"><div style="height:100%;width:${(100*o.done/o.n).toFixed(1)}%;background:${o.color}"></div></div>
+      <div class="crow" style="flex-wrap:wrap;justify-content:space-between"><span><strong>${o.done}</strong> / ${o.n} wagons · reste ${o.n-o.done} · fin estimée vers ${new Date(simDate().getTime()+acc*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span><button class="btn" type="button" data-pl="${L}" data-pa="end">Terminer cet ordre</button></div>`}
+    g('plNext'+L).innerHTML=q.length>1?q.slice(1).map((x,i)=>{acc+=x.n*step;return `<div class="crow" style="justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding:5px 0"><span><span class="wsw" style="display:inline-block;vertical-align:middle;background:${x.color}"></span> ${rd(x.ref)} · <strong>${x.n}</strong> wagons · fin vers ${new Date(simDate().getTime()+acc*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span><span class="crow">${i?`<button class="btn" type="button" data-pl="${L}" data-pa="up" data-pi="${i+1}" aria-label="Monter">▲</button>`:''}<button class="btn" type="button" data-pl="${L}" data-pa="del" data-pi="${i+1}">Retirer</button></span></div>`}).join(''):'<p class="info" style="margin:0">Rien à suivre.</p>';
+    const sel=g('plRef'+L),cur=sel.value,sig=RF.refs.map(r=>r.code+r.h+r.l).join();if(sel.dataset.sig!==sig){sel.dataset.sig=sig;sel.innerHTML=RF.refs.map(r=>`<option value="${r.code}">${r.code} · ${r.h} couches, ${r.l} par ${r.l}</option>`).join('');if(cur&&RF.refs.some(r=>r.code===cur))sel.value=cur}})}
+function planInit(){const g=id=>document.getElementById(id),col={A:'#2B4FA8',B:'#C8372D'};
+  const sw=L=>{g('plCol'+L).innerHTML=SW.map(c=>`<button type="button" class="swb" data-c="${c}" style="background:${c}" aria-label="Couleur ${c}" aria-pressed="${c===col[L]}"></button>`).join('')};
+  ['A','B'].forEach(L=>{sw(L);g('plCol'+L).addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b){col[L]=b.dataset.c;sw(L)}});
+    g('plAdd'+L).addEventListener('click',()=>{const ref=g('plRef'+L).value,n=Math.max(1,Math.min(500,Math.round(Number(g('plN'+L).value)||1)));if(!ref){g('plMsg').textContent='Créez d’abord une référence dans l’onglet « Références supports ».';return}
+      const o={id:Date.now()%1e7,ref,n,done:0,color:col[L]};Y.plan[L].push(o);addLog('OP',null,`Planning ligne ${L} : ${n} wagons ${ref} ajoutés${Y.plan[L].length===1?' (démarre maintenant)':''}`,`Ligne ${L}`,'Poste');
+      g('plMsg').textContent=Y.plan[L].length===1?`Ligne ${L} : ordre ${ref} démarré, la ligne se règle au début du prochain wagon.`:`Ligne ${L} : ordre ${ref} ajouté à la suite (${Y.plan[L].length-1} ordre(s) avant lui).`;renderPlan(true);stSave()})});
+  g('pagePlan').addEventListener('click',e=>{const b=e.target.closest('[data-pa]');if(!b)return;const L=b.dataset.pl,q=Y.plan[L],i=Number(b.dataset.pi);
+    if(b.dataset.pa==='end'&&q[0]){const o=q.shift();addLog('OP',null,`Planning ligne ${L} : ordre ${o.ref} arrêté à ${o.done}/${o.n}`,`Ligne ${L}`,'Poste')}
+    else if(b.dataset.pa==='del')q.splice(i,1);else if(b.dataset.pa==='up'&&i>1)[q[i-1],q[i]]=[q[i],q[i-1]];
+    renderPlan(true);stSave()});
+  setInterval(()=>renderPlan(false),1000)}
 function infoInit(){
   const g=id=>document.getElementById(id);
   g('iX').addEventListener('click',closeI);g('iOk').addEventListener('click',closeI);g('imodal').addEventListener('click',ev=>{if(ev.target.id==='imodal')closeI()});
@@ -1686,7 +1827,10 @@ function selInit(){
 }
 function zInit(){
   const g=id=>document.getElementById(id);
-  g('ystat').addEventListener('click',ev=>{const t=ev.target.closest('[data-zone]');if(t)openZ(t.dataset.zone)});
+  const trTog=n=>{Y.trOff[n]=!Y.trOff[n];if(!Y.trOff[n])delete Y.trOff[n];const off=!trOn(n);
+    const eff={55:'aucun wagon ne sort du séchoir ; l’engobage peut encore évacuer vers le transbordeur 1',41:'le transbordeur 2 ne dépose plus de wagon sur la voie 4',42:'les wagons pré-séchoir restent en tête de voie 4',14:'voie 1 : plus de prise par le transbordeur 2 ni de mise en place des vides',34:'voie 3 : plus de prise par le transbordeur 2 ni de mise en place des vides',11:'voie 1 : le wagon déchargé reste au déchargement',31:'voie 3 : le wagon déchargé reste au déchargement'}[n];
+    addLog('OP',null,`Trainard ${n} ${off?'mis à l’arrêt : '+eff:'remis en marche'}`,`Trainard ${n}`,'Poste');const m=g('adjMsg');if(m)m.textContent=`Trainard ${n} ${off?'à l’arrêt : '+eff+'.':'remis en marche.'}`;renderYard(true);stSave()};
+  g('ystat').addEventListener('click',ev=>{const r=ev.target.closest('[data-tr]');if(r){trTog(r.dataset.tr);return}const t=ev.target.closest('[data-zone]');if(t)openZ(t.dataset.zone)});
   g('ystat').addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){const t=ev.target.closest('[data-zone]');if(t){ev.preventDefault();openZ(t.dataset.zone)}}});
   g('zSlots').addEventListener('click',ev=>{const b=ev.target.closest('[data-zi]');if(!b)return;let i=Number(b.dataset.zi);const a=zA(zEd.k);if(isQ(zEd.k)&&!a[i])i=a.length;zEd.sel=i;renderZ();g('zNo').focus()});
   g('zSw').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;zEd.col=b.dataset.c;g('zCol').value=zEd.col;g('zSw').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
@@ -1764,7 +1908,7 @@ function snapY(){const ids=a=>a.map(w=>w?w.uid:null);
   return {v:1,at:Date.now(),t0:Y.t0,simT:Y.simT,wag:allW().map(w=>Object.assign({},w)),
     E:{1:ids(Y.E[1]),3:ids(Y.E[3])},M:{1:ids(Y.M[1]),3:ids(Y.M[3])},D:{1:ids(Y.D[1]),3:ids(Y.D[3])},v2:ids(Y.v2),v4:ids(Y.v4),v4b:ids(Y.v4b),fx:ids(Y.fx),t1w:Y.t1w?Y.t1w.uid:null,psIn:Y.psIn?Y.psIn.uid:null,tun:Object.fromEntries(TUN.map(k=>[k,ids(Y[k])])),
     T2:Object.assign({},Y.T2,{w:Y.T2.w?Y.T2.w.uid:null}),T3:Object.assign({},Y.T3,{w:Y.T3.w?Y.T3.w.uid:null}),
-    sc:{ser:Y.ser,seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
+    sc:{plan:Y.plan,trOff:Y.trOff,pt:Y.pt,ser:Y.ser,seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
 function stSave(){if(catching)return;try{localStorage.setItem(STKEY,JSON.stringify(snapY()));lastSave=Date.now()}catch(e){}}
 function stLoad(){let s;try{s=JSON.parse(localStorage.getItem(STKEY)||'null')}catch(e){return null}
   if(!s||s.v!==1||!Array.isArray(s.wag)||!s.wag.length)return null;
@@ -1787,7 +1931,7 @@ function catchUp(sec,why){
     addLog('OP',null,`${why} : ${hmS(sec)} rattrapées, wagons à leur position actuelle`,'Toutes les voies','Poste');renderYard(true);updateKpi();stSave()};
   setTimeout(tick,0)}
 /* ---------- boucle ---------- */
-function stepAll(d){for(const ln of LINES){if(YP['stop'+ln.id])continue;CUR=ln;S=ln.S;P=ln.P;step(d)}CUR=ACT;S=ACT.S;P=ACT.P;yardStep(d)}
+function stepAll(d){autoRef();for(const ln of LINES){if(YP['stop'+ln.id]||YP['ptOn'+ln.id])continue;CUR=ln;S=ln.S;P=ln.P;step(d)}CUR=ACT;S=ACT.S;P=ACT.P;yardStep(d)}
 const WARM=130000*0.05;Y.t0=Date.now()-WARM*1000;Y.simT=0;
 LINES.forEach(l=>{l.S=fresh()});S=ACT.S;
 for(let i=0;i<140;i++){CUR=LINES[1];S=LINES[1].S;P=LINES[1].P;step(0.05)} // la ligne B démarre avec quelques secondes de décalage
