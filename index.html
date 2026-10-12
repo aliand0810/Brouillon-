@@ -118,6 +118,7 @@ body.fsOn{overflow:hidden}
 .photop{position:fixed;right:12px;bottom:12px;z-index:70;width:min(460px,calc(100vw - 24px));max-height:70vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.25)}
 .photop .ph{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .photop .pb{overflow:auto;flex:1 1 auto}.photop img{display:block;width:100%}
+.swb{width:24px;height:24px;border-radius:4px;border:1px solid #4A4F55;cursor:pointer;padding:0}.swb[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 14px}
 .sgrid label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
 .sgrid textarea{font:500 13px var(--f-mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);resize:vertical}
@@ -338,6 +339,11 @@ img{max-width:100%}
       <div class="yc"><span class="fl">Déchargement</span><span class="crow" style="flex-wrap:wrap"><button class="btn" id="dAdv1" type="button">▶ Avancer voie 1</button><button class="btn" id="dAdv3" type="button">▶ Avancer voie 3</button></span></div>
       <p class="step" id="adjMsg" style="flex:1 1 240px"></p>
     </div>
+    <div class="card hmibar" id="serCard">
+      <div class="yc" style="flex:1 1 100%"><span class="fl">Séries de wagons : identifier une série par sa couleur</span></div>
+      <div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNA" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne A"><span>wagons · déjà faits</span><input type="number" id="serKA" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne A"><span class="sws" id="serCA" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoA" type="button">Lancer</button><button class="btn" id="serEndA" type="button">Terminer</button></span><span class="info" id="serSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNB" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne B"><span>wagons · déjà faits</span><input type="number" id="serKB" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne B"><span class="sws" id="serCB" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoB" type="button">Lancer</button><button class="btn" id="serEndB" type="button">Terminer</button></span><span class="info" id="serSB"></span></div>
+      <p class="step" id="serMsg" style="flex:1 1 100%"></p>
+    </div>
     <div class="card ysum" id="ysum"></div>
     <div class="card hmi" id="hmiBox"><div class="fsin" id="fsIn"><div class="fsbar"><span id="fsInfo"></span><button class="btn" id="fsExit" type="button">✕ Quitter le plein écran</button></div>
       <div class="selbar" id="selBar" hidden>
@@ -345,6 +351,7 @@ img{max-width:100%}
         <span class="crow" style="flex-wrap:wrap">Temps de déchargement :
           <button class="btn" type="button" data-sm="15">15 min</button><button class="btn" type="button" data-sm="30">30 min</button>
           <input type="number" id="selMin" min="1" max="600" value="20" class="numin" style="width:64px" aria-label="Minutes"><span>min</span><button class="btn pri" id="selApply" type="button">Appliquer</button></span>
+        <span class="crow" style="flex-wrap:wrap">Couleur des wagons sélectionnés : <span id="selCol" style="display:inline-flex;gap:3px"></span></span>
         <span class="crow" style="flex-wrap:wrap">Déchargement en cours : <button class="btn" type="button" data-sd="stop">⏸ Stopper</button><button class="btn" type="button" data-sd="go">▶ Reprendre</button><button class="btn" type="button" data-sd="5">+5 min</button><button class="btn" type="button" data-sd="15">+15 min</button></span>
         <span class="crow" style="flex-wrap:wrap"><button class="btn" id="selDep" type="button">Tout le déchargement</button><button class="btn" id="selNow" type="button">Déchargés maintenant</button><button class="btn" id="selClear" type="button">Effacer la sélection</button><button class="btn" id="selEnd" type="button">Terminer</button></span>
         <span class="info" id="selMsg"></span>
@@ -435,9 +442,9 @@ img{max-width:100%}
     </div>
   </div>
   <div class="modal" id="imodal" hidden>
-    <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="iT" style="max-width:460px">
+    <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="iT" style="max-width:660px">
       <div class="dlg-h" style="grid-template-columns:auto minmax(0,1fr) auto"><span class="wsw" id="iSw"></span><h2 id="iT">Wagon</h2><button class="x" id="iX" type="button" aria-label="Fermer">×</button></div>
-      <div class="dlg-b" style="padding:12px 16px"><p class="info" style="margin:0 0 8px">Consultation : seules les commandes de déchargement ci-dessous agissent sur le wagon.</p><dl class="idl" id="iDl"></dl><div id="iDep" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><span class="fl">Déchargement en cours</span><div class="crow" style="flex-wrap:wrap;margin-top:6px"><button class="btn" id="iHold" type="button">⏸ Stopper le déchargement</button><button class="btn" type="button" data-dx="5">+5 min</button><button class="btn" type="button" data-dx="15">+15 min</button><button class="btn" type="button" data-dx="30">+30 min</button></div></div></div>
+      <div class="dlg-b" style="padding:12px 16px"><p class="info" style="margin:0 0 8px">Consultation : seules les commandes de déchargement et de production ci-dessous modifient les wagons.</p><dl class="idl" id="iDl"></dl><div id="iDep" hidden style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><span class="fl">Déchargement en cours</span><div class="crow" style="flex-wrap:wrap;margin-top:6px"><button class="btn" id="iHold" type="button">⏸ Stopper le déchargement</button><button class="btn" type="button" data-dx="5">+5 min</button><button class="btn" type="button" data-dx="15">+15 min</button><button class="btn" type="button" data-dx="30">+30 min</button></div></div><div id="iProd" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><span class="fl">Production : ce wagon et les précédents de sa ligne</span><div class="crow" style="flex-wrap:wrap;margin-top:6px"><label class="crow" style="font-size:12.5px">Wagons produits <input type="number" id="pN" min="1" max="100" value="15" class="numin" style="width:60px"></label><label class="crow" style="font-size:12.5px">Déchargement estimé <input type="number" id="pMin" min="1" max="600" value="15" class="numin" style="width:60px"> min / wagon</label></div><div class="crow" style="margin-top:6px;flex-wrap:wrap"><span style="font-size:12.5px">Couleur</span><span id="pCol" style="display:inline-flex;gap:3px;flex-wrap:wrap"></span><button class="btn pri" id="pGo" type="button">Appliquer à ces wagons</button></div><p class="info" id="pMsg" style="margin:6px 0 0"></p><div class="scroll" style="max-height:240px;margin-top:6px"><table class="log" id="pTab"></table></div></div></div>
       <div class="dlg-f"><div><button class="btn" id="iLocate" type="button">Montrer sur la carte</button></div><div><button class="btn" id="iEdit" type="button">Modifier</button><button class="btn pri" id="iOk" type="button">Fermer</button></div></div>
     </div>
   </div>
@@ -952,7 +959,7 @@ const lineOf=v=>YP.exA===v?'A':YP.exB===v?'B':'—';
 // tunnels (positions fixes, null = place vide) : pré-séchoir, séchoir, engobage, préfour, four
 const TUN=['ps','se','en','pf','sa','fo'],TMAX={ps:()=>YP.psMax,se:()=>YP.seMax,en:()=>YP.enMax,pf:()=>YP.pfMax,sa:()=>YP.saMax,fo:()=>YP.foMax};
 const TNAME={ps:'Pré-séchoir',se:'Séchoir',en:'Engobage',pf:'Préfour',sa:'Sas',fo:'Four'};
-const Y={mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
+const Y={ser:{A:null,B:null},mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
   T2:{ph:'idle',p:0,w:null,from:1,last:3,next:null,wait:null,seq:[]},T3:{ph:'idle',p:0,w:null,to:1,nextL:'A'},flash:{t1:0,t4:0,t3p:0,tr:{}},log:[]};
 TUN.forEach(k=>{Y[k]=Array(TMAX[k]()).fill(null)});
 function fitTun(k){const n=TMAX[k](),a=Y[k],ws=a.filter(Boolean);if(a.length===n)return;
@@ -982,7 +989,11 @@ function parkWagon(sup){
   let w=E.find(x=>!x.loaded);
   if(!w){if(E.length>=YP['e'+vn]||allW().length>=YP.fleet)return false;
     w={uid:++Y.uid,no:++Y.no,color:CUR.id==='A'?YP.colA:YP.colB,pre:!!(CUR.id==='A'?YP.preA:YP.preB),ret:vn};E.push(w)}
-  w.loaded=true;w.sup=sup;w.line=CUR.id;w.tz=0;addLog('CH',w,`Wagon chargé ligne ${CUR.id} (${fmt(sup,0)} supports)`,`Voie ${vn} chargement`);return true;
+  w.loaded=true;w.sup=sup;w.line=CUR.id;w.tz=0;w.lt=Y.simT;
+  const sr=Y.ser&&Y.ser[CUR.id];let st='';
+  if(sr&&sr.done<sr.n){sr.done++;w.color=sr.color;w.ser={id:sr.id,i:sr.done,n:sr.n};st=` · série ${sr.done}/${sr.n}`;if(sr.done>=sr.n){addLog('OP',w,`Série ligne ${CUR.id} terminée (${sr.n} wagons)`,`Voie ${vn} chargement`,'Poste');Y.ser[CUR.id]=null}}
+  else if(w.ser){w.ser=null;w.color=CUR.id==='A'?YP.colA:YP.colB}
+  addLog('CH',w,`Wagon chargé ligne ${CUR.id} (${fmt(sup,0)} supports)${st}`,`Voie ${vn} chargement`);return true;
 }
 // une poussée : tous les tunnels avancent d'une position, de l'aval vers l'amont
 function fixV4Order(){const a=Y.v4,pre=a.filter(w=>w.pre),qA=a.filter(w=>!w.pre&&w.line==='A'),qB=a.filter(w=>!w.pre&&w.line!=='A');if(!qA.length||!qB.length)return false;
@@ -1271,7 +1282,7 @@ function syncCarto(){
 }
 function yardInit(){
   const g=id=>document.getElementById(id);
-  drawStatic();buildCarto();zInit();adjInit();fsInit();scanInit();selInit();infoInit();dragInit();
+  drawStatic();buildCarto();zInit();adjInit();fsInit();scanInit();selInit();infoInit();dragInit();serInit();
   g('ywag').addEventListener('click',ev=>{const t=ev.target.closest('[data-uid]');if(!t)return;const u=Number(t.dataset.uid);if(selMode){SEL.has(u)?SEL.delete(u):SEL.add(u);selUpd();renderYard(true)}else if(document.getElementById('fixMode').checked){openW(u);setTimeout(()=>{const n=document.getElementById('wNo');n.focus();n.select()},60)}else openI(u)});
   g('ywag').addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){const t=ev.target.closest('[data-uid]');if(t){ev.preventDefault();t.dispatchEvent(new MouseEvent('click',{bubbles:true}))}}});
   g('pageVoies').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
@@ -1433,6 +1444,7 @@ function applyScan(fresh){
     const main=[...Y.fx,...[...Y.fo].reverse(),...[...Y.sa].reverse(),...[...Y.pf].reverse(),Y.t1w,...[...Y.en].reverse(),...[...Y.se].reverse()].filter(Boolean);
     const nxt=alt(main,YP.v4Start);alt(Y.v4.filter(w=>!w.pre),nxt);alt([...Y.ps].reverse().filter(Boolean),nxt);
     const seIn=Y.se.find(Boolean)||Y.ps.find(Boolean);Y.seqNext=seIn?(seIn.line==='A'?'B':'A'):YP.v4Start;
+    allW().forEach(w=>{if(w.line==='A'||w.line==='B')w.ret=w.line==='A'?YP.exA:YP.exB}); // retour sur la voie de sa ligne
     const v4Last=Y.v4[Y.v4.length-1];Y.T2.next=v4Last?(v4Last.line==='A'?'B':'A'):YP.v4Start; }
   Y.no=Math.max(Y.no,...seen);if(total>YP.fleet)YP.fleet=total;
   ysave();drawStatic();addLog('OP',null,`Cartographie importée : ${total} wagons${dup.length?' (doublons ignorés : '+dup.join(', ')+')':''}`,'Toutes les voies','Poste');
@@ -1523,7 +1535,7 @@ function fmtEta(pushes){if(pushes==null)return '—';const s=(pushes-1)*cadSec()
   const days=Math.floor((d-new Date(simDate().toDateString()))/864e5);return `${pushes} poussée${pushes>1?'s':''} · dans ${s<3600?cd(s):hmS(s)} (${days>0?(days===1?'demain ':'dans '+days+' jours '):''}vers ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})})`}
 function infoRows(w){
   const r=[['Emplacement',whereW(w)],['État',w.loaded?`chargé · ${fmt(w.sup,0)} supports`:'vide'],['Ligne',w.line?'Ligne '+w.line:'—'],['Pré-séchoir',w.pre?'oui (PS)':'non'],
-    ['Code couleur',`<span class="wsw" style="display:inline-block;vertical-align:middle;background:${w.color}"></span>`],['Temps dans la zone',hmS(w.tz||0)],
+    ['Code couleur',`<span class="wsw" style="display:inline-block;vertical-align:middle;background:${w.color}"></span>${w.ser?` · série : wagon ${w.ser.i} sur ${w.ser.n}`:''}`],['Temps dans la zone',hmS(w.tz||0)],
     ['Voie de déchargement',`voie ${w.ret} (ligne ${lineOf(w.ret)})`],['Temps de déchargement',`${w.tDep||YP.tDep} min${w.dx?` + ${w.dx} min ajoutées`:''}`]];
   const inD=[1,3].find(v=>Y.D[v].includes(w));
   if(inD){const first=Y.D[inD][0]===w;r.push(['Déchargement',w.loaded?(first?`${w.hold?'<b>à l’arrêt</b>':'en cours'} · reste ${cd(depLeft(w))}`:`en attente (${Y.D[inD].indexOf(w)} wagon(s) devant)${w.hold?' · <b>arrêt demandé</b>':''}`):'terminé · en route vers le chargement'])}
@@ -1542,7 +1554,7 @@ function depCtl(ws,act){ws=ws.filter(w=>w.loaded&&[1,3].some(v=>Y.D[v].includes(
   const t=act==='stop'?'Déchargement stoppé':act==='go'?'Déchargement repris':`Déchargement prolongé de ${act} min`;
   if(ws.length===1)addLog('OP',ws[0],t,whereW(ws[0]),'Poste');else addLog('OP',null,`${t} : ${ws.map(w=>no3(w.no)).join(', ')}`,'Déchargement','Poste');
   renderYard(true);stSave();return ws.length}
-function openI(uid){iUid=uid;document.getElementById('imodal').hidden=false;renderI();document.getElementById('iOk').focus()}
+function openI(uid){iUid=uid;document.getElementById('imodal').hidden=false;renderI();renderProd();document.getElementById('iOk').focus()}
 function closeI(){document.getElementById('imodal').hidden=true;iUid=null}
 /* ---------- déplacement manuel : appui long puis glisser-déposer ---------- */
 let DRG=null,dragJust=false;
@@ -1602,6 +1614,35 @@ function dragInit(){
   g('lnStop').addEventListener('click',ev=>{const b=ev.target.closest('[data-ls]');if(!b)return;const L=b.dataset.ls,k='stop'+L;YP[k]=YP[k]?0:1;ysave();
     addLog('OP',null,`Ligne ${L} ${YP[k]?'mise à l’arrêt : le transbordeur 2 dispatche les wagons de l’autre ligne':'remise en marche'}`,`Voie ${L==='A'?YP.exA:YP.exB}`,'Poste');renderYard(true);stSave()});
 }
+/* ---------- séries de wagons (identification par couleur) ---------- */
+function recentOf(L){ // wagons chargés de la ligne, du plus récent au plus ancien
+  const v=L==='A'?YP.exA:YP.exB,o=[];const push=a=>a.forEach(w=>{if(w&&w.loaded&&w.line===L&&!o.includes(w))o.push(w)});
+  push([...Y.E[v]].reverse());if(Y.T2.w)push([Y.T2.w]);push([...Y.v4].reverse());push([...Y.v4b].reverse());if(Y.psIn)push([Y.psIn]);push(Y.ps);push(Y.se);push(Y.en);if(Y.t1w)push([Y.t1w]);push(Y.pf);push(Y.sa);push(Y.fo);push(Y.fx);if(Y.T3.w)push([Y.T3.w]);[1,3].forEach(x=>push([...Y.D[x]].reverse()));
+  o.sort((a,b)=>(b.lt??-1e12)-(a.lt??-1e12));return o}
+function serInit(){
+  const g=id=>document.getElementById(id),cur={A:'#C8372D',B:'#C8372D'};
+  const sw=(el,sel,on)=>{el.innerHTML=SW.map(c=>`<button type="button" class="swb" data-c="${c}" style="background:${c}" aria-label="Couleur ${c}" aria-pressed="${c===sel}"></button>`).join('');el.onclick=ev=>{const b=ev.target.closest('[data-c]');if(b)on(b.dataset.c)}};
+  const draw=L=>sw(g('serC'+L),cur[L],c=>{cur[L]=c;draw(L)});
+  ['A','B'].forEach(L=>{draw(L);
+    g('serGo'+L).addEventListener('click',()=>{const n=Math.max(1,Math.min(200,Math.round(Number(g('serN'+L).value)||0))),k=Math.max(0,Math.min(n,Math.round(Number(g('serK'+L).value)||0)));
+      const id=Date.now()%1e7,done=recentOf(L).slice(0,k).reverse();done.forEach((w,i)=>{w.color=cur[L];w.ser={id,i:i+1,n}});
+      Y.ser[L]=k<n?{id,n,done:done.length,color:cur[L]}:null;
+      addLog('OP',null,`Série ligne ${L} : ${n} wagons${k?`, ${done.length} déjà faits (${done.map(w=>no3(w.no)).join(', ')})`:''}`,`Ligne ${L}`,'Poste');
+      g('serMsg').textContent=`Série ligne ${L} lancée : ${done.length} wagon(s) déjà fait(s) mis en couleur${done.length<k?` (seulement ${done.length} wagon(s) chargé(s) trouvés sur la ligne ${L})`:''}, les ${n-done.length} suivants seront colorés au chargement.`;renderYard(true);stSave()});
+    g('serEnd'+L).addEventListener('click',()=>{if(!Y.ser[L])return;addLog('OP',null,`Série ligne ${L} arrêtée à ${Y.ser[L].done}/${Y.ser[L].n}`,`Ligne ${L}`,'Poste');Y.ser[L]=null;g('serMsg').textContent=`Série ligne ${L} arrêtée. Les wagons déjà colorés gardent leur couleur.`;renderYard(true);stSave()})});
+  // couleur pour la sélection multiple
+  let sc=null;const selDraw=()=>sw(g('selCol'),sc,c=>{sc=c;const ws=allW().filter(w=>SEL.has(w.uid));if(!ws.length){selDraw();return selUpd('Sélectionnez d’abord des wagons sur la carte.')}
+    ws.forEach(w=>{w.color=c});addLog('OP',null,`Couleur appliquée à ${ws.length} wagon(s) : ${ws.map(w=>no3(w.no)).join(', ')}`,'Sélection multiple','Poste');selUpd(`${ws.length} wagon(s) mis à la même couleur.`);selDraw();renderYard(true);stSave()});selDraw();
+}
+function serStatus(){const g=id=>document.getElementById(id);['A','B'].forEach(L=>{const e=g('serS'+L);if(!e)return;const r=Y.ser&&Y.ser[L];
+  e.innerHTML=r?`<span class="wsw" style="display:inline-block;vertical-align:middle;background:${r.color}"></span> en cours : <strong>${r.done}/${r.n}</strong> · reste ${r.n-r.done}`:'aucune série en cours'})}
+function prodGroup(w,n){if(!w||!w.loaded||!w.line)return [];const r=recentOf(w.line),i=r.indexOf(w);return i<0?[]:r.slice(i,i+n)}
+function renderProd(){const g=id=>document.getElementById(id),w=allW().find(x=>x.uid===iUid);if(!w)return;const n=Math.max(1,Math.min(100,Math.round(Number(g('pN').value)||1)));
+  const grp=prodGroup(w,n);if(!grp.length){g('pTab').innerHTML='';g('pMsg').textContent='Ce wagon est vide : la production se compte à partir d’un wagon chargé.';return}
+  const P0=(LINES.find(l=>l.id===w.line)||LINES[0]).P,lay=P0.pileH;let ts=0,tm=0;
+  const rows=grp.map((x,k)=>{ts+=x.sup||0;const m=x.tDep||YP.tDep;tm+=m;return `<tr><td>${k+1}</td><td><span class="wsw" style="display:inline-block;vertical-align:middle;background:${x.color}"></span> <b>${no3(x.no)}</b></td><td>${whereW(x)}</td><td>${lay}</td><td>${fmt(x.sup||0,0)}</td><td>${m} min</td></tr>`}).join('');
+  g('pTab').innerHTML=`<thead><tr><th>#</th><th>Wagon</th><th>Emplacement</th><th>Couches</th><th>Supports</th><th>Déchargement</th></tr></thead><tbody>${rows}<tr style="font-weight:700"><td></td><td>Total ${grp.length} wagons</td><td></td><td>${lay*grp.length}</td><td>${fmt(ts,0)}</td><td>${hmS(tm*60)}</td></tr></tbody>`;
+  g('pMsg').textContent=grp.length<n?`Seulement ${grp.length} wagon(s) de la ligne ${w.line} trouvés avant celui-ci dans le circuit.`:`Wagon ${no3(w.no)} et les ${grp.length-1} wagons chargés avant lui sur la ligne ${w.line}.`}
 function infoInit(){
   const g=id=>document.getElementById(id);
   g('iX').addEventListener('click',closeI);g('iOk').addEventListener('click',closeI);g('imodal').addEventListener('click',ev=>{if(ev.target.id==='imodal')closeI()});
@@ -1609,6 +1650,13 @@ function infoInit(){
   g('iEdit').addEventListener('click',()=>{const u=iUid;closeI();openW(u)});
   g('iLocate').addEventListener('click',()=>{Y.find={uid:iUid,t:10};closeI()});
   const iw=()=>allW().find(x=>x.uid===iUid);
+  let pc='#C8372D';const pDraw=()=>{g('pCol').innerHTML=SW.map(c=>`<button type="button" class="swb" data-c="${c}" style="background:${c}" aria-label="Couleur ${c}" aria-pressed="${c===pc}"></button>`).join('')};pDraw();
+  g('pCol').addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){pc=b.dataset.c;pDraw()}});
+  g('pN').addEventListener('input',renderProd);
+  g('pGo').addEventListener('click',()=>{const w=iw(),n=Math.max(1,Math.min(100,Math.round(Number(g('pN').value)||1))),m=Math.max(1,Math.min(600,Math.round(Number(g('pMin').value)||YP.tDep)));const grp=prodGroup(w,n);if(!grp.length)return;
+    const id=Date.now()%1e7;[...grp].reverse().forEach((x,k)=>{x.color=pc;x.tDep=m;x.ser={id,i:k+1,n:grp.length}});
+    addLog('OP',w,`Production ${grp.length} wagons ligne ${w.line} : même couleur, déchargement ${m} min (${grp.map(x=>no3(x.no)).join(', ')})`,whereW(w),'Poste');
+    renderProd();renderI();renderYard(true);stSave();g('pMsg').textContent=`${grp.length} wagons mis à la même couleur, déchargement estimé ${m} min chacun.`});
   g('iHold').addEventListener('click',()=>{const w=iw();if(w){depCtl([w],w.hold?'go':'stop');renderI()}});
   g('iDep').querySelectorAll('[data-dx]').forEach(b=>b.addEventListener('click',()=>{const w=iw();if(w){depCtl([w],Number(b.dataset.dx));renderI()}}));
   const find=()=>{const n=Math.round(Number(g('findNo').value));const w=allW().find(x=>x.no===n);if(!w){g('adjMsg').textContent=`Le wagon n° ${no3(n||0)} n’est pas dans le circuit.`;return}Y.find={uid:w.uid,t:10};openI(w.uid)};
@@ -1687,6 +1735,7 @@ function renderYard(force){
   if(document.activeElement!==g('cadM'))g('cadM').value=YP.cadM;if(document.activeElement!==g('cadS'))g('cadS').value=YP.cadS;
   g('cadOn').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.cad)===YP.cadOn)));
   g('manOn').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.m)===YP.manOn)));
+  serStatus();
   [1,3].forEach(v=>{const b=g('dAdv'+v);if(b)b.textContent=`▶ Avancer ligne ${lineOf(v)} (voie ${v})`;});
   g('lnStop').querySelectorAll('[data-ls]').forEach(b=>{const st=!!YP['stop'+b.dataset.ls];b.textContent=`Ligne ${b.dataset.ls} : ${st?'■ arrêt':'● marche'}`;b.setAttribute('aria-pressed',String(!st));b.style.color=st?'var(--bad,#C62828)':''});
   g('v4Ord').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.o===YP.v4Start)));g('v4Strict').checked=!!YP.v4Strict;{const nx=Y.T2.next||YP.v4Start,wt=YP.v4Strict&&Y.T2.ph==='idle'&&Y.T2.wait===nx&&!Y.E[nx==='A'?YP.exA:YP.exB].some(w=>w.loaded);g('seqInfo').textContent=`Entrée séchoir : prochain wagon ligne ${Y.seqNext||YP.v4Start} · voie 4 : prochain ligne ${nx}${wt?` — en attente d’un wagon ligne ${nx}${YP['stop'+nx]?' (ligne '+nx+' à l’arrêt)':''}`:''}`}g('depMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dm===YP.depMode)));
@@ -1715,7 +1764,7 @@ function snapY(){const ids=a=>a.map(w=>w?w.uid:null);
   return {v:1,at:Date.now(),t0:Y.t0,simT:Y.simT,wag:allW().map(w=>Object.assign({},w)),
     E:{1:ids(Y.E[1]),3:ids(Y.E[3])},M:{1:ids(Y.M[1]),3:ids(Y.M[3])},D:{1:ids(Y.D[1]),3:ids(Y.D[3])},v2:ids(Y.v2),v4:ids(Y.v4),v4b:ids(Y.v4b),fx:ids(Y.fx),t1w:Y.t1w?Y.t1w.uid:null,psIn:Y.psIn?Y.psIn.uid:null,tun:Object.fromEntries(TUN.map(k=>[k,ids(Y[k])])),
     T2:Object.assign({},Y.T2,{w:Y.T2.w?Y.T2.w.uid:null}),T3:Object.assign({},Y.T3,{w:Y.T3.w?Y.T3.w.uid:null}),
-    sc:{seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
+    sc:{ser:Y.ser,seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
 function stSave(){if(catching)return;try{localStorage.setItem(STKEY,JSON.stringify(snapY()));lastSave=Date.now()}catch(e){}}
 function stLoad(){let s;try{s=JSON.parse(localStorage.getItem(STKEY)||'null')}catch(e){return null}
   if(!s||s.v!==1||!Array.isArray(s.wag)||!s.wag.length)return null;
