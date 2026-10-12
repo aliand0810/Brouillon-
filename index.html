@@ -430,6 +430,10 @@ img{max-width:100%}
 
   </div>
   <div class="photop" id="photoP" hidden><div class="ph"><strong style="flex:1">Photo importée</strong><label class="crow" style="font-size:12.5px"><input type="checkbox" id="fixMode"> Corriger les numéros au toucher</label><button class="btn" id="phMinus" type="button" aria-label="Réduire">−</button><button class="btn" id="phPlus" type="button" aria-label="Agrandir">+</button><button class="btn" id="phX" type="button" aria-label="Fermer">×</button></div><div class="pb"><img id="photoImg" alt="Photo importée de la cartographie"></div></div>
+  <div class="modal" id="tbmodal" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="tbT" style="max-width:420px">
+    <div class="dlg-h" style="grid-template-columns:minmax(0,1fr) auto"><h2 id="tbT">Transbordeur</h2><button class="x" id="tbX" type="button" aria-label="Fermer">×</button></div>
+    <div class="dlg-b" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px"><div class="seg" role="group" aria-label="Service" id="tbSeg"><button type="button" data-tbs="1">En service</button><button type="button" data-tbs="0">Arrêt</button></div><div id="tbF" style="display:flex;flex-direction:column;gap:8px"></div><p class="info" id="tbI"></p></div>
+    <div class="dlg-f"><div></div><div><button class="btn pri" id="tbOk" type="button">Fermer</button></div></div></div></div>
   <div class="modal" id="catchOv" hidden aria-live="polite"><div class="dlg" style="max-width:420px;padding:20px 22px"><h2 style="margin:0 0 8px">Reprise de la production</h2><p class="info" id="catchTx" style="margin:0 0 10px"></p><div style="height:8px;background:var(--panel2);border-radius:4px;overflow:hidden"><div id="catchBar" style="height:100%;width:0;background:var(--accent)"></div></div></div></div>
   <div class="modal" id="cmodal" hidden>
     <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="cT" style="max-width:640px">
@@ -995,9 +999,9 @@ function updT3(){
 /* ---------- cartographie des voies : circuit fermé des wagons (commun aux lignes A et B) ---------- */
 const YKEY='ligne-voies-v3';
 const YD={fleet:100,e1:2,d1:3,e3:2,d3:3,v2Max:2,v4Max:25,psMax:4,seMax:27,seZones:11,enMax:3,pfMax:8,saMax:1,foMax:34,
-  cadM:19,cadS:0,cadOn:1,v4Start:'A',v4Strict:1,depMode:'line',dm2:1,ex2:1,preA:1,preB:0,exA:3,exB:1,manOn:1,tMan:20,tDep:15,colA:'#2B4FA8',colB:'#C8372D',acc:2,ptA:15,ptB:15,ptOnA:0,ptOnB:0,mMax:3,v4bMax:4,fxMax:3,stopA:0,stopB:0};
+  cadM:19,cadS:0,cadOn:1,v4Start:'A',v4Strict:1,depMode:'line',dm2:1,ex2:1,preA:1,preB:0,exA:3,exB:1,manOn:1,tMan:20,tDep:15,colA:'#2B4FA8',colB:'#C8372D',acc:2,t2v1:20,t2v2:20,t2v3:20,t3v1:20,t3v3:20,t3ps:20,tb2:1,ptA:15,ptB:15,ptOnA:0,ptOnB:0,mMax:3,v4bMax:4,fxMax:3,stopA:0,stopB:0};
 const YP=Object.assign({},YD);
-try{const s=JSON.parse(localStorage.getItem(YKEY)||'null');if(s){for(const k in YD)if(typeof s[k]===typeof YD[k])YP[k]=s[k];if(!('depMode' in s)||s.tDep===30)YP.tDep=15;if(!('dm2' in s)){YP.depMode='line';YP.dm2=1}if(!('ex2' in s)){YP.exA=3;YP.exB=1;YP.ex2=1}}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(YKEY)||'null');if(s){for(const k in YD)if(typeof s[k]===typeof YD[k])YP[k]=s[k];if(!('depMode' in s)||s.tDep===30)YP.tDep=15;if(!('dm2' in s)){YP.depMode='line';YP.dm2=1}if(!('ex2' in s)){YP.exA=3;YP.exB=1;YP.ex2=1}if(!('tb2' in s)&&typeof s.tMan==='number'){YP.t2v1=YP.t2v3=YP.t3v1=YP.t3v3=YP.t3ps=s.tMan;YP.tb2=1}}}catch(e){}
 const normE=()=>{YP.acc=Math.max(1,Math.min(2,YP.acc|0||2));YP.e1=YP.e3=YP.acc+1};normE(); // chargement = 1 wagon en place + les wagons chargés accumulés devant
 const ysave=()=>{normE();try{localStorage.setItem(YKEY,JSON.stringify(YP))}catch(e){}};
 const SW=['#2B4FA8','#C8372D','#E8C72E','#151A4A','#2E8955','#7A4FA0','#1F8A8A','#8B5A2B','#E36D9B','#F2F2F2'];
@@ -1006,7 +1010,7 @@ const lineOf=v=>YP.exA===v?'A':YP.exB===v?'B':'—';
 // tunnels (positions fixes, null = place vide) : pré-séchoir, séchoir, engobage, préfour, four
 const TUN=['ps','se','en','pf','sa','fo'],TMAX={ps:()=>YP.psMax,se:()=>YP.seMax,en:()=>YP.enMax,pf:()=>YP.pfMax,sa:()=>YP.saMax,fo:()=>YP.foMax};
 const TNAME={ps:'Pré-séchoir',se:'Séchoir',en:'Engobage',pf:'Préfour',sa:'Sas',fo:'Four'};
-const Y={plan:{A:[],B:[]},trOff:{},pt:{A:0,B:0},ser:{A:null,B:null},mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
+const Y={tbOff:{},plan:{A:[],B:[]},trOff:{},pt:{A:0,B:0},ser:{A:null,B:null},mv:[],M:{1:[],3:[]},v4b:[],psIn:null,t1w:null,tr55:null,seqNext:null,lastPush:null,t0:Date.now(),simT:0,catchLeft:0,catchSec:300,E:{1:[],3:[]},D:{1:[],3:[]},v2:[],v4:[],fx:[],ps:[],se:[],en:[],pf:[],fo:[],no:0,uid:0,exped:0,cadT:0,bloc:'',clock:6*3600,day:0,
   T2:{ph:'idle',p:0,w:null,from:1,last:3,next:null,wait:null,seq:[]},T3:{ph:'idle',p:0,w:null,to:1,nextL:'A'},flash:{t1:0,t4:0,t3p:0,tr:{}},log:[]};
 TUN.forEach(k=>{Y[k]=Array(TMAX[k]()).fill(null)});
 function fitTun(k){const n=TMAX[k](),a=Y[k],ws=a.filter(Boolean);if(a.length===n)return;
@@ -1014,8 +1018,10 @@ function fitTun(k){const n=TMAX[k](),a=Y[k],ws=a.filter(Boolean);if(a.length===n
 const allW=()=>{const a=[];[1,3].forEach(v=>a.push(...Y.E[v],...Y.M[v],...Y.D[v]));a.push(...Y.v2,...Y.v4,...Y.v4b,...Y.fx);TUN.forEach(k=>Y[k].forEach(w=>{if(w)a.push(w)}));if(Y.t1w)a.push(Y.t1w);if(Y.psIn)a.push(Y.psIn);if(Y.T2.w)a.push(Y.T2.w);if(Y.T3.w)a.push(Y.T3.w);return a};
 const places=()=>YP.e1+YP.d1+YP.e3+YP.d3+2*YP.mMax+YP.v4bMax+YP.fxMax-1+YP.v2Max+YP.v4Max+2+TUN.reduce((a,k)=>a+TMAX[k](),0);
 const hhmmss=s=>{s=Math.floor(s)%86400;return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(x=>String(x).padStart(2,'0')).join(':')};
-const EX0=310,LOADX=401,MX0=450;
-function ePos(v,i){const a=Y.E[v],w=a[i];let nl=0,ne=0;for(let j=0;j<i;j++)a[j].loaded?nl++:ne++;return w&&w.loaded?EX0+nl*24:LOADX+ne*24}
+const EX0=310,LOADX=401,MX0=490;
+// voie 1 / 3 : 2 wagons chargés maximum à côté (devant le chargement), le 3ᵉ reste en position de chargement
+function ePos(v,i){const a=Y.E[v],w=a[i],acc=YP.acc;let nl=0,ne=0,ov=0;for(let j=0;j<i;j++){if(a[j].loaded){if(nl<acc)nl++;else ov++}else ne++}
+  if(w&&w.loaded&&nl<acc)return EX0+nl*24;const k=ov+ne;return k?LOADX+6+k*24:LOADX} // au-delà du poste de chargement : à droite de la colonne
 const mPos=(v,i)=>MX0+i*24;
 const simDate=()=>new Date(Y.t0+Y.simT*1000);
 const depT=w=>Math.max(1,(w.tDep||YP.tDep))*60+(w.dx||0)*60;
@@ -1053,6 +1059,7 @@ function applyRef(L,ui=true,rr){const r=rr||refOf(L),ln=LINES.find(l=>l.id===L);
   if(ln.S&&ln.S.wagon){const W=ln.S.wagon;if(W.h>r.h||W.h%r.l)W.h=0;if(W.col>=r.c)W.col=r.c-1}
   try{localStorage.setItem(ln.key,JSON.stringify(p))}catch(e){}
   if(ui&&ln===ACT)try{syncPanel();buildRates();updateMeas()}catch(e){}}
+const tbOn=n=>!(Y.tbOff&&Y.tbOff[n]);
 const trOn=n=>!(Y.trOff&&Y.trOff[n]);
 function lineWagons(L){const v=L==='A'?YP.exA:YP.exB;return {v,done:recentOf(L),up:[...Y.E[v].filter(w=>!w.loaded),...Y.M[v]]}}
 function parkWagon(sup){
@@ -1086,17 +1093,18 @@ function pushCore(){
   const pi=lastIdx(Y.ps),psW=pi>=0?Y.ps[pi]:null;
   Y.lastPush={se:null,v4:false,v4b:false};let moved=false;
   // voie 4 = une seule file : seul le wagon de tête (côté transbordeur 4) peut sortir, aucun wagon ne passe devant un autre
-  while(trOn(42)&&Y.v4[0]&&Y.v4[0].pre&&Y.v4b.length<YP.v4bMax){const w=Y.v4.shift();w.tz=0;Y.v4b.push(w);Y.lastPush.v4=true;Y.lastPush.v4b=true;addLog('TR42',w,'Trainard 42 : tête de voie 4 → voie 4b, attente du transbordeur 3','Voie 4b');moved=true}
+  while(tbOn(4)&&trOn(42)&&Y.v4[0]&&Y.v4[0].pre&&Y.v4b.length<YP.v4bMax){const w=Y.v4.shift();w.tz=0;Y.v4b.push(w);Y.lastPush.v4=true;Y.lastPush.v4b=true;addLog('TR42',w,'Trainard 42 : tête de voie 4 → voie 4b, attente du transbordeur 3','Voie 4b');moved=true}
   const head=Y.v4[0]&&!Y.v4[0].pre?Y.v4[0]:null;
   let choice=null,brk='';
   const psOk=!!psW&&!!Y.psIn&&!Y.ps.includes(null); // le pré-séchoir garde toujours ses wagons : la sortie n'a lieu que si le remplaçant attend déjà à l'entrée (déposé par le transbordeur 3)
   if(head&&head.line===exp)choice='v4';else if(psOk&&psW.line===exp)choice='ps';
   else if(!YP.v4Strict){if(head)choice='v4';else if(psOk)choice='ps'}
   else if(head){choice='v4';brk=`alternance impossible : aucun wagon ligne ${exp} en tête de voie 4 ni en sortie du pré-séchoir`}
-  if(Y.t1w){if(!canAccept('pf')){Y.bloc='Sortie du four occupée : le transbordeur 3 doit libérer la voie 6.';return 'bloc'}
+  if(Y.t1w&&tbOn(1)){if(!canAccept('pf')){Y.bloc='Sortie du four occupée : le transbordeur 3 doit libérer la voie 6.';return 'bloc'}
     const w=Y.t1w;Y.t1w=null;Y.flash.t1=1.5;addLog('T1',w,'Transbordeur 1 → entrée préfour (fin du compte à rebours)','Voie 6 préfour');insertInto('pf',w);moved=true}
-  if(!trOn(55)&&!Y.t1w){const a=Y.en;let li=-1;for(let i=a.length-1;i>=0;i--)if(a[i]){li=i;break}
+  if(!trOn(55)&&!Y.t1w&&tbOn(1)){const a=Y.en;let li=-1;for(let i=a.length-1;i>=0;i--)if(a[i]){li=i;break}
     if(li===a.length-1&&canAccept('pf')){const w=a[li];for(let i=li;i>0;i--)a[i]=a[i-1];a[0]=null;w.tz=0;Y.t1w=w;Y.flash.t1=1.5;addLog('T1',w,'Engobage → transbordeur 1 (trainard 55 à l’arrêt : le séchoir ne sort pas)','Voie 5 → voie 6');moved=true}}
+  if(!tbOn(4))choice=null; // transbordeur 4 à l'arrêt : rien n'entre dans le séchoir
   if(choice!=null&&!trOn(55)&&!Y.se.includes(null))choice=null; // trainard 55 à l'arrêt : le séchoir ne sort pas, il n'est donc pas alimenté
   if(choice!=null){
     if(!canAccept('se')){Y.bloc='Sortie du four occupée : le transbordeur 3 doit libérer la voie 6.';return 'bloc'}
@@ -1110,7 +1118,7 @@ function pushCore(){
   return moved?'ok':'vide';
 }
 const NEXT={ps:null,se:'en',en:'t1',t1:'pf',pf:'sa',sa:'fo',fo:'fx'};
-function canAccept(k){if(k==='fx')return Y.fx.length<YP.fxMax;if(k==='se')return Y.se.includes(null)||(trOn(55)&&canAccept('en'));if(k==='t1')return !Y.t1w||canAccept('pf');if(!k)return false;const a=Y[k];return a.includes(null)||canAccept(NEXT[k])}
+function canAccept(k){if(k==='fx')return Y.fx.length<YP.fxMax;if(k==='t1'&&!tbOn(1))return false;if(k==='se')return Y.se.includes(null)||(trOn(55)&&canAccept('en'));if(k==='t1')return !Y.t1w||canAccept('pf');if(!k)return false;const a=Y[k];return a.includes(null)||canAccept(NEXT[k])}
 // voie 6 : préfour + sas + four forment un seul train poussé d'un bloc (pas de trou entre les zones)
 const V6=['pf','sa','fo'];
 function v6view(){const r=[];for(const k of V6)Y[k].forEach((_,i)=>r.push([k,i]));return r}
@@ -1168,7 +1176,7 @@ function t3Voie(w){const vOf=L=>L==='A'?YP.exA:YP.exB,room=v=>Y.D[v].length<YP['
   if(YP.depMode==='alt'){const want=T3.nextL||'A',o=want==='A'?'B':'A',v=room(vOf(want))||!room(vOf(o))?vOf(want):vOf(o);T3.nextL=v===vOf(want)?o:want;return v}
   if(YP.depMode==='line')return vOf(w.line==='B'?'B':'A');return w.ret}
 function psArrive(w){w.tz=0;if(Y.ps.includes(null)){insertInto('ps',w);addLog('T3',w,'Transbordeur 3 : voie 4b → pré-séchoir','Voie 5b pré-séchoir')}else{Y.psIn=w;addLog('T3',w,'Transbordeur 3 : voie 4b → attente à l’entrée du pré-séchoir','Voie 5b')}Y.flash.t3p=1.5}
-function flushT3(){
+function flushT3(){if(!tbOn(3))return;
   const T3=Y.T3;if(T3.ph==='move'&&T3.w&&T3.job==='ps'&&(!Y.psIn||Y.ps.includes(null))){psArrive(T3.w);T3.w=null;T3.ph='idle';T3.p=0;T3.job=null}
   while(Y.v4b[0]&&(!Y.psIn||Y.ps.includes(null))&&T3.ph!=='move')psArrive(Y.v4b.shift());
   if(T3.ph==='move'&&T3.w&&T3.job!=='ps'){const w=T3.w;w.tz=0;w.dt=0;Y.D[w.ret].push(w);addLog('T3',w,`Transfert sortie four → déchargement ligne ${lineOf(w.ret)} (voie ${w.ret})`,`Voie ${w.ret}`);T3.w=null;T3.ph='idle';T3.p=0}
@@ -1219,7 +1227,15 @@ function yardStep(dt){
   // transbordeur 2 : wagon chargé (voies 1 et 3 en alternance) → voie 4
   const T2=Y.T2;
   const multi=Y.anim&&Y.anim.track&&Y.anim.t<animDur();
-  if(T2.ph==='move'){T2.p=Math.min(multi||!trOn(41)?1:9,T2.p+dt/YP.tMan);if(T2.p>=1&&!multi&&trOn(41)){T2.w.tz=0;Y.v4.push(T2.w);Y.flash.tr[41]=3;T2.seq.push(T2.line);if(T2.seq.length>12)T2.seq.shift();addLog('T2',T2.w,`Transfert ligne ${T2.line} (voie ${T2.from}) → voie 4 · prochain : ligne ${T2.next}`,'Voie 4');T2.w=null;T2.ph='idle';T2.p=0}}
+  if(tbOn(2)){ // transbordeur 2 en service
+  if(T2.ph==='move'&&(T2.to==='v2'||T2.to==='v1'||T2.to==='v3')){T2.p=Math.min(1,T2.p+dt/Math.max(1,T2.dur||YP.t2v1));const dv=Number(T2.to[1]),room=dv===2?Y.v2.length<YP.v2Max:Y.E[dv].length<YP['e'+dv];
+    if(T2.p>=1&&room){const w=T2.w;w.tz=0;if(dv===2)Y.v2.unshift(w);else{Y.E[dv].unshift(w);w.ret=dv}addLog('T2',w,`Transfert manuel voie ${T2.from} → voie ${dv}${dv===2?'':' (chargement)'}`,`Voie ${dv}`);T2.w=null;T2.ph='idle';T2.p=0;T2.to=null}}
+  else if(T2.ph==='move'){T2.p=Math.min(multi||!trOn(41)?1:9,T2.p+dt/Math.max(1,T2.dur||(T2.from===1?YP.t2v1:YP.t2v3)));if(T2.p>=1&&!multi&&trOn(41)){T2.w.tz=0;Y.v4.push(T2.w);Y.flash.tr[41]=3;T2.seq.push(T2.line);if(T2.seq.length>12)T2.seq.shift();addLog('T2',T2.w,`Transfert ligne ${T2.line} (voie ${T2.from}) → voie 4 · prochain : ligne ${T2.next}`,'Voie 4');T2.w=null;T2.ph='idle';T2.p=0}}
+  else if(T2.order&&!multi){ // ordre manuel : aller chercher un wagon précis (voie 1, 2 ou 3) et le poser sur la voie 4 ou la voie 2
+    const o=T2.order,src=[[1,Y.E[1]],[1,Y.M[1]],[3,Y.E[3]],[3,Y.M[3]],[2,Y.v2]].find(([v,a])=>a.some(x=>x.uid===o.uid));
+    if(!src){T2.order=null;addLog('OP',null,'Ordre transbordeur 2 annulé : wagon introuvable sur les voies 1, 2, 3','Transbordeur 2','Poste')}
+    else if(o.to==='v2'?Y.v2.length<YP.v2Max||src[0]===2:o.to==='v4'?Y.v4.length<YP.v4Max:Y.E[Number(o.to[1])].length<YP['e'+o.to[1]]||src[0]===Number(o.to[1])){const a=src[1],w=a.splice(a.findIndex(x=>x.uid===o.uid),1)[0];T2.w=w;T2.from=src[0];T2.last=src[0];T2.to=o.to;T2.line=w.line||'—';T2.dur=src[0]===1?YP.t2v1:src[0]===3?YP.t2v3:YP.t2v2;
+      if(o.to==='v4'&&(w.line==='A'||w.line==='B'))T2.next=w.line==='A'?'B':'A';T2.ph='move';T2.p=0;T2.order=null;addLog('T2',w,`Ordre manuel : voie ${src[0]} → voie ${o.to[1]}`,`Voie ${src[0]}`,'Poste')}}
   else if(YP.manOn&&Y.v4.length<YP.v4Max&&!multi){ // pendant une avance de plusieurs pas, la voie 4 n'est pas réalimentée
     // ordre d'entrée sur la voie 4 : A, B, A, B… ou B, A, B, A…
     const want=T2.next||YP.v4Start,other=want==='A'?'B':'A',vOf=L=>L==='A'?YP.exA:YP.exB;
@@ -1227,16 +1243,19 @@ function yardStep(dt){
     let p=pick(want),sub='';
     if(!p){const o=pick(other);if(o){const full=Y.E[o.v].filter(x=>x.loaded).length>=YP.acc;
       if(!YP.v4Strict){sub=YP['stop'+want]?`ligne ${want} à l’arrêt`:full?`${YP.acc} wagons accumulés ligne ${other}`:`pas de wagon prêt ligne ${want}`;p=o}}} // ordre strict : jamais AA ni BB sur la voie 4
-    if(p){T2.w=Y.E[p.v].splice(p.i,1)[0];if(sub)addLog('T2',T2.w,`Ligne ${want} sans wagon (${sub}) : wagon de la ligne ${other} dispatché`,`Voie ${p.v}`);T2.from=p.v;T2.last=p.v;T2.line=p.L;T2.next=p.L==='A'?'B':'A';T2.wait=null;T2.ph='move';T2.p=0}else T2.wait=want}
+    if(p){T2.w=Y.E[p.v].splice(p.i,1)[0];if(sub)addLog('T2',T2.w,`Ligne ${want} sans wagon (${sub}) : wagon de la ligne ${other} dispatché`,`Voie ${p.v}`);T2.from=p.v;T2.last=p.v;T2.line=p.L;T2.next=p.L==='A'?'B':'A';T2.wait=null;T2.to='v4';T2.dur=p.v===1?YP.t2v1:YP.t2v3;T2.ph='move';T2.p=0}else T2.wait=want}
+  }
   // transbordeur 3 : sortie du four → déchargement de la voie choisie pour le wagon
   const T3=Y.T3;
-  if(T3.ph==='move'){T3.p=Math.min(1,T3.p+dt/YP.tMan);if(T3.p>=1){const w=T3.w;
+  if(tbOn(3)){ // transbordeur 3 en service
+  if(T3.ph==='move'){T3.p=Math.min(1,T3.p+dt/Math.max(1,T3.job==='ps'?YP.t3ps:T3.to===1?YP.t3v1:YP.t3v3));if(T3.p>=1){const w=T3.w;
       if(T3.job==='ps'){if(!Y.psIn||Y.ps.includes(null)){psArrive(w);T3.w=null;T3.ph='idle';T3.p=0;T3.job=null}}
       else{w.tz=0;w.dt=0;Y.D[w.ret].push(w);addLog('T3',w,`Transfert sortie four → déchargement ligne ${lineOf(w.ret)} (voie ${w.ret})`,`Voie ${w.ret}`);T3.w=null;T3.ph='idle';T3.p=0;T3.job=null}}}
   else if(YP.manOn&&!multi&&Y.fx[0]){
     // priorité aux wagons en attente à la sortie du four : récupérés et posés sur la voie programmée (ils y attendent si le déchargement est occupé)
     const w=Y.fx[0],v=t3Voie(w);w.ret=v;T3.w=Y.fx.shift();T3.to=v;T3.job='fo';T3.y0=VY[6];T3.y1=VY[v];T3.ph='move';T3.p=0}
   else if(YP.manOn&&!multi&&Y.v4b[0]&&(!Y.psIn||Y.ps.includes(null))){T3.w=Y.v4b.shift();T3.job='ps';T3.y0=VY[4];T3.y1=VY[5];T3.ph='move';T3.p=0}
+  }
   if(Y.psIn&&Y.ps.includes(null)){const w=Y.psIn;Y.psIn=null;insertInto('ps',w);addLog('T3',w,'Entrée pré-séchoir (complète les 4 wagons)','Voie 5b pré-séchoir')}
 }
 const lum=c=>{const n=parseInt(c.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255;return .2126*r+.7152*g+.0722*b};
@@ -1276,8 +1295,10 @@ function drawStatic(){
   track(50,252,VY[2]);track(292,1040,VY[1]);track(292,1040,VY[3]);track(292,885,VY[4]);track(925,1040,VY[4]);
   track(85,885,VY[5]);track(925,1040,VY[5]);track(85,1040,VY[6]);
   band(252,0,320);band(1040,40,545);band(885,255,445);band(45,375,545);
+  [[2,252,0,320],[3,1040,40,545],[4,885,255,445],[1,45,375,545]].forEach(([n,x,y1,y2])=>s.push(`<rect class="tbhit" data-tb="${n}" x="${x}" y="${y1}" width="40" height="${y2-y1}" fill="transparent" tabindex="0" role="button" aria-label="Transbordeur ${n} : mise en service ou arrêt"><title>Transbordeur ${n} : toucher pour l’arrêter ou le remettre en service</title></rect>`));
   T(14,VY[2]+4,'Voie 2');T(214,VY[1]+4,'Voie 1');T(214,VY[3]+4,'Voie 3');T(214,VY[4]+4,'Voie 4');T(1090,VY[4]+4,'Voie 4b');T(10,VY[5]+4,'Voie 5');T(1090,VY[5]+4,'Voie 5b');T(10,VY[6]+4,'Voie 6');
   T(272,345,'Transbordeur 2','middle',10);T(1060,30,'Transbordeur 3','middle',10);T(905,474,'Transbordeur 4','middle',10);T(65,368,'Transbordeur 1','middle',10);
+  [[2,318,345],[3,1114,30],[4,958,474],[1,108,368]].forEach(([n,x,y])=>s.push(`<rect class="tbset" data-tbset="${n}" x="${x-9}" y="${y-12}" width="18" height="16" rx="3" fill="var(--panel,#fff)" stroke="#8E9296" stroke-width=".6" style="cursor:pointer" role="button" tabindex="0" aria-label="Temps de transfert du transbordeur ${n}"><title>Temps de transfert du transbordeur ${n}</title></rect><text x="${x}" y="${y}" text-anchor="middle" style="font-size:11px;pointer-events:none">⚙</text>`));
   // chargement / déchargement
   s.push(`<rect x="382" y="52" width="38" height="190" fill="var(--hmi-pur)"/>`);T(401,44,'Chargement','middle',10.5,600);
   [1,3].forEach(v=>{s.push(`<text x="334" y="${VY[v]-19}" text-anchor="middle" style="font-size:8.5px;fill:var(--muted,#6A6F75)">chargés (${YP.acc} max)</text><text x="${MX0+24}" y="${VY[v]-19}" text-anchor="middle" style="font-size:8.5px;fill:var(--muted,#6A6F75)">vides en attente</text>`)});
@@ -1294,13 +1315,13 @@ function drawStatic(){
   s.push(`<rect class="zbox" data-zone="sa" x="266" y="${VY[6]-32}" width="32" height="64" fill="var(--hmi-ora)"><title>Sas : voir ou modifier le wagon</title></rect>`);T(282,VY[6]-20,'Sas','middle',10,700);
   s.push(`<rect class="zbox" data-zone="fo" x="300" y="${VY[6]-32}" width="640" height="64" fill="var(--hmi-red)"><title>Modifier les wagons du four</title></rect>`);s.push(`<text x="620" y="${VY[6]-20}" text-anchor="middle" style="font-size:10.5px;font-weight:600;fill:#fff">Four</text>`);
   // trainards
-  [[14,392,VY[1]+26],[11,744,VY[1]+26],[34,392,VY[3]+26],[31,744,VY[3]+26],[41,318,VY[4]+26],[42,1000,VY[4]+26],[55,200,VY[5]+18]].forEach(([n,x,y])=>{
+  [[14,432,VY[1]+26],[11,744,VY[1]+26],[34,432,VY[3]+26],[31,744,VY[3]+26],[41,318,VY[4]+26],[42,1000,VY[4]+26],[55,200,VY[5]+18]].forEach(([n,x,y])=>{
     s.push(`<rect id="tr${n}" x="${x}" y="${y}" width="18" height="6" rx="1" fill="var(--hmi-tr-off)"/><text id="tra${n}" x="${x-3}" y="${y+6.5}" text-anchor="end" style="font-size:11px;font-weight:700;fill:var(--hmi-tr)"></text><text id="trs${n}" x="${x+9}" y="${y-3}" text-anchor="middle" style="font-size:8px;font-weight:700;fill:#C62828"></text>`);s.push(`<rect class="trhit" data-tr="${n}" x="${x-16}" y="${y-12}" width="${n===55?120:56}" height="${n===55?22:32}" fill="transparent" tabindex="0" role="button" aria-label="Trainard ${n} : marche ou arrêt"><title>Trainard ${n} : toucher pour l’arrêter ou le remettre en marche</title></rect>`);if(n===55)T(x+22,y+7,'Trainard '+n,'start',9.5);else T(x+9,y+18,'Trainard '+n,'middle',9.5)});
   // zones cliquables des voies
   const hit=(z,x,y,w,hh,t)=>s.push(`<rect class="zhit" data-zone="${z}" x="${x}" y="${y}" width="${w}" height="${hh}" tabindex="0" role="button" aria-label="${t}"><title>${t}</title></rect>`);
   hit('v2',50,VY[2]-15,202,30,'Voie 2 : ajouter ou modifier des wagons');
-  hit('E1',292,VY[1]-15,140,30,'Voie 1, chargement : ajouter ou modifier des wagons');hit('M1',432,VY[1]-15,168,30,'Voie 1, wagons vides en attente');hit('D1',600,VY[1]-15,440,30,'Voie 1, déchargement : ajouter ou modifier des wagons');
-  hit('E3',292,VY[3]-15,140,30,'Voie 3, chargement : ajouter ou modifier des wagons');hit('M3',432,VY[3]-15,168,30,'Voie 3, wagons vides en attente');hit('D3',600,VY[3]-15,440,30,'Voie 3, déchargement : ajouter ou modifier des wagons');
+  hit('E1',292,VY[1]-15,178,30,'Voie 1, chargement : ajouter ou modifier des wagons');hit('M1',470,VY[1]-15,130,30,'Voie 1, wagons vides en attente');hit('D1',600,VY[1]-15,440,30,'Voie 1, déchargement : ajouter ou modifier des wagons');
+  hit('E3',292,VY[3]-15,178,30,'Voie 3, chargement : ajouter ou modifier des wagons');hit('M3',470,VY[3]-15,130,30,'Voie 3, wagons vides en attente');hit('D3',600,VY[3]-15,440,30,'Voie 3, déchargement : ajouter ou modifier des wagons');
   hit('E1',382,52,38,96,'Voie 1, chargement');hit('E3',382,148,38,94,'Voie 3, chargement');hit('D1',628,52,38,96,'Voie 1, déchargement');hit('D3',628,148,38,94,'Voie 3, déchargement');
   hit('v4',292,VY[4]-15,593,30,'Voie 4 : ajouter ou modifier des wagons');hit('v4b',925,VY[4]-15,115,30,'Voie 4b : wagons pré-séchoir en attente du transbordeur 3');
   hit('fx',940,VY[6]-15,100,30,'Voie 6, sortie du four : ajouter ou modifier des wagons');
@@ -1309,7 +1330,7 @@ function drawStatic(){
 // positions des wagons
 function wagPos(){
   const L=[];const add=(w,x,y,zc,lab)=>{if(w)L.push([w,x,y,zc,lab])};
-  [1,3].forEach(v=>{const fe=Y.E[v].find(x=>!x.loaded);Y.E[v].forEach((w,k)=>add(w,ePos(v,k),VY[v],'E',w===fe&&!YP['stop'+lineOf(v)]?'en charge':null));Y.M[v].forEach((w,k)=>add(w,mPos(v,k),VY[v],'E'));Y.D[v].forEach((w,k)=>add(w,647+k*24,VY[v],w.loaded?'D':'E',k===0?(w.loaded?(w.hold?'\u0001':'')+cd(depLeft(w)):(Y.E[v].length>=YP['e'+v]?'attente':'→ ch.')):(w.loaded?(w.tDep||YP.tDep)+'′':'')))});
+  [1,3].forEach(v=>{const fe=Y.E[v].find(x=>!x.loaded);Y.E[v].forEach((w,k)=>{const x=ePos(v,k);add(w,x,VY[v],'E',w===fe&&x===LOADX&&!YP['stop'+lineOf(v)]?'en charge':w.loaded&&x>=LOADX?'plein':null)});Y.M[v].forEach((w,k)=>add(w,mPos(v,k),VY[v],'E'));Y.D[v].forEach((w,k)=>add(w,647+k*24,VY[v],w.loaded?'D':'E',k===0?(w.loaded?(w.hold?'\u0001':'')+cd(depLeft(w)):(Y.E[v].length>=YP['e'+v]?'attente':'→ ch.')):(w.loaded?(w.tDep||YP.tDep)+'′':'')))});
   Y.v2.forEach((w,k)=>add(w,232-k*24,VY[2],'v2'));
   const n4=Y.v4.length,sp4=Math.min(23,560/Math.max(1,n4));Y.v4.forEach((w,k)=>add(w,872-k*sp4,VY[4],'v4'));
   const evac=()=>YP.cadOn?(Y.bloc?'bloqué':cd(Math.max(0,cadSec()-Y.cadT))):'arrêt';
@@ -1331,7 +1352,7 @@ function drawDyn(){
        const y=sNow<=L[i-1]?a[1]:sNow>=L[i]?b[1]:p[1]; // le transbordeur attend le wagon au niveau de prise, le porte, puis reste au niveau de dépose
        if(Math.abs(a[0]-905)<2)y4=y;else if(Math.abs(a[0]-65)<2)y1=y;else if(Math.abs(a[0]-1060)<2)y3a=y}}}
   // transbordeur 2
-  const T2=Y.T2;let y2=VY[4];if(T2.ph==='move'){const e2=e(Math.min(1,T2.p*1.6)),yA=VY[T2.from];y2=T2.p<.6?yA+(VY[4]-yA)*e2:VY[4]}
+  const T2=Y.T2;let y2=VY[4];if(T2.ph==='move'){const e2=e(Math.min(1,T2.p*1.6)),yA=VY[T2.from],yB=T2.to&&T2.to!=='v4'?VY[Number(T2.to[1])]:VY[4];y2=T2.p<.6?yA+(yB-yA)*e2:yB}
   s.push(`<rect x="254" y="${y2-17}" width="36" height="34" fill="var(--hmi-car)"/>`);if(T2.w&&T2.p<.6)s.push(wagSvg(T2.w,272,y2,'E'));
   // transbordeur 3
   const T3=Y.T3;let y3=y3a!=null&&T3.ph!=='move'?y3a:VY[6];if(T3.ph==='move'){const e3=e(Math.min(1,T3.p*1.6)),a0=T3.y0!=null?T3.y0:VY[6],a1=T3.y1!=null?T3.y1:VY[T3.to];y3=T3.p<.6?a0+(a1-a0)*e3:a1}
@@ -1343,8 +1364,9 @@ s.push(`<rect x="887" y="${y4-17}" width="36" height="34" fill="var(--hmi-car)"/
   { const left=YP.cadOn?(Y.bloc?'évacuation bloquée':'évacuation dans '+cd(Math.max(0,cadSec()-Y.cadT))):'poussée à l’arrêt';
     s.push(`<rect x="88" y="${VY[5]+36}" width="100" height="15" rx="3" fill="#FFFFFF" stroke="var(--hmi-pur)" stroke-width="1"/><text x="138" y="${VY[5]+47}" text-anchor="middle" style="font-size:9.5px;font-weight:700">${left}</text>`); }
   if(Y.find&&Y.find.t>0){const hit=wagPosAnim().find(a=>a[0].uid===Y.find.uid);if(hit)s.push(`<circle cx="${hit[1].toFixed(1)}" cy="${hit[2]}" r="${(26+4*Math.sin(Y.find.t*6)).toFixed(1)}" fill="none" stroke="#E3622A" stroke-width="3"/>`)}
+  [[2,252,0,320],[3,1040,40,545],[4,885,255,445],[1,45,375,545]].forEach(([n,x,y1,y2])=>{if(!tbOn(n))s.push(`<rect x="${x}" y="${y1}" width="40" height="${y2-y1}" fill="#C62828" fill-opacity=".28" pointer-events="none"/><text x="${x+20}" y="${(y1+y2)/2}" text-anchor="middle" transform="rotate(-90 ${x+20} ${(y1+y2)/2})" style="font-size:11px;font-weight:700;fill:#C62828" pointer-events="none">ARRÊT</text>`)});
   document.getElementById('ydyn').innerHTML=s.join('');
-  { const TRX={14:392,11:744,34:392,31:744,41:318,42:1000,55:200},on={},xs={},dir={41:1,42:1,55:-1,14:-1,34:-1,11:-1,31:-1};
+  { const TRX={14:432,11:744,34:432,31:744,41:318,42:1000,55:200},on={},xs={},dir={41:1,42:1,55:-1,14:-1,34:-1,11:-1,31:-1};
     for(const n in TRX){on[n]=(f.tr[n]||0)>0;xs[n]=TRX[n]}
     if(Y.T2.ph==='move'&&Y.T2.p<.6){on[Y.T2.from===1?14:34]=true}
     for(const m of Y.mv){const p=mvAt(m.uid);if(p&&m.tr){on[m.tr]=true;xs[m.tr]=p[0]+12;dir[m.tr]=Math.sign(m.pts[1][0]-m.pts[0][0])||-1}}
@@ -1359,7 +1381,7 @@ function buildCarto(){
     ['Voies 2 et 4',[['v2Max','Voie 2 · places',1,10],['v4Max','Voie 4 · places de stockage',1,60],['v4bMax','Voie 4b · wagons en attente du transbordeur 3',1,4]]],
     ['Voie 5',[['psMax','Pré-séchoir · places',1,10],['seMax','Séchoir · places',2,60],['seZones','Séchoir · nombre de zones',1,20],['enMax','Engobage · places',1,10]]],
     ['Voie 6',[['pfMax','Préfour · places',1,15],['saMax','Sas · places',1,3],['foMax','Four · places',2,60],['fxMax','Sortie four · wagons en attente du transbordeur 3',1,3]]],
-    ['Transbordeurs',[['tMan','Durée d’un transfert (s)',5,600]]]];
+    ['Transbordeurs (temps de transfert en s)',[['t2v1','Transbordeur 2 · depuis la voie 1',1,900],['t2v3','Transbordeur 2 · depuis la voie 3',1,900],['t3v1','Transbordeur 3 · vers la voie 1',1,900],['t3v3','Transbordeur 3 · vers la voie 3',1,900],['t3ps','Transbordeur 3 · voie 4b → pré-séchoir',1,900]]]];
   document.getElementById('cgrid').innerHTML=F.map(([t,fs])=>`<h4>${t}</h4>`+fs.map(([k,l,mn,mx])=>`<label>${l}<input type="number" class="numin" data-ck="${k}" min="${mn}" max="${mx}" step="1"></label>`).join('')).join('')
     +`<h4>Lignes</h4><label>Ligne A : chargement sur<select data-cs="exA" class="numin"><option value="3">Voie 3</option><option value="1">Voie 1</option></select></label><label>Ligne B : chargement sur<select data-cs="exB" class="numin"><option value="1">Voie 1</option><option value="3">Voie 3</option></select></label>`
     +`<label>Code couleur ligne A<input type="color" data-cc="colA"></label><label>Code couleur ligne B<input type="color" data-cc="colB"></label>`
@@ -1653,7 +1675,7 @@ function closeI(){document.getElementById('imodal').hidden=true;iUid=null}
 let DRG=null,dragJust=false;
 function dropSlots(){
   const L=[],qs=(k,arr,cap,f)=>{const n=Math.max(arr.length,Math.min(arr.length+1,cap));for(let i=0;i<n;i++){const [x,y]=f(i);L.push({k,i,x,y})}};
-  [1,3].forEach(v=>{{const a=Y.E[v],ne=a.filter(w=>!w.loaded).length;a.forEach((w,i)=>L.push({k:'E'+v,i,x:ePos(v,i),y:VY[v]}));if(a.length<YP['e'+v])L.push({k:'E'+v,i:a.length,x:LOADX+ne*24,y:VY[v]})}
+  [1,3].forEach(v=>{{const a=Y.E[v],ne=a.filter(w=>!w.loaded).length;a.forEach((w,i)=>L.push({k:'E'+v,i,x:ePos(v,i),y:VY[v]}));if(a.length<YP['e'+v])L.push({k:'E'+v,i:a.length,x:(()=>{const kk=a.filter(w=>!w.loaded).length+Math.max(0,a.filter(w=>w.loaded).length-YP.acc);return kk?LOADX+6+kk*24:LOADX})(),y:VY[v]})}
     qs('M'+v,Y.M[v],YP.mMax,i=>[mPos(v,i),VY[v]]);qs('D'+v,Y.D[v],YP['d'+v],i=>[647+i*24,VY[v]])});
   qs('v2',Y.v2,YP.v2Max,i=>[232-i*24,VY[2]]);
   {const sp4=Math.min(23,560/Math.max(1,Y.v4.length));qs('v4',Y.v4,YP.v4Max,i=>[872-i*sp4,VY[4]])}
@@ -1830,7 +1852,19 @@ function zInit(){
   const trTog=n=>{Y.trOff[n]=!Y.trOff[n];if(!Y.trOff[n])delete Y.trOff[n];const off=!trOn(n);
     const eff={55:'aucun wagon ne sort du séchoir ; l’engobage peut encore évacuer vers le transbordeur 1',41:'le transbordeur 2 ne dépose plus de wagon sur la voie 4',42:'les wagons pré-séchoir restent en tête de voie 4',14:'voie 1 : plus de prise par le transbordeur 2 ni de mise en place des vides',34:'voie 3 : plus de prise par le transbordeur 2 ni de mise en place des vides',11:'voie 1 : le wagon déchargé reste au déchargement',31:'voie 3 : le wagon déchargé reste au déchargement'}[n];
     addLog('OP',null,`Trainard ${n} ${off?'mis à l’arrêt : '+eff:'remis en marche'}`,`Trainard ${n}`,'Poste');const m=g('adjMsg');if(m)m.textContent=`Trainard ${n} ${off?'à l’arrêt : '+eff+'.':'remis en marche.'}`;renderYard(true);stSave()};
-  g('ystat').addEventListener('click',ev=>{const r=ev.target.closest('[data-tr]');if(r){trTog(r.dataset.tr);return}const t=ev.target.closest('[data-zone]');if(t)openZ(t.dataset.zone)});
+  const TBF={1:[],2:[['t2v1','Prise sur la voie 1'],['t2v3','Prise sur la voie 3'],['t2v2','Prise sur la voie 2']],3:[['t3v1','Sortie four → voie 1'],['t3v3','Sortie four → voie 3'],['t3ps','Voie 4b → pré-séchoir']],4:[]};let tbN=null;
+  const tbTog=n=>{Y.tbOff[n]=!Y.tbOff[n];if(!Y.tbOff[n])delete Y.tbOff[n];const off=!tbOn(n);const eff={1:'l’engobage ne peut plus évacuer et le préfour n’est plus alimenté',2:'plus aucun wagon chargé ne passe des voies 1 et 3 à la voie 4',3:'la sortie du four et la voie 4b ne sont plus desservies',4:'plus aucun wagon n’entre dans le séchoir'}[n];
+    addLog('OP',null,`Transbordeur ${n} ${off?'à l’arrêt : '+eff:'remis en service'}`,`Transbordeur ${n}`,'Poste');const m=g('adjMsg');if(m)m.textContent=`Transbordeur ${n} ${off?'à l’arrêt : '+eff+'.':'remis en service.'}`;renderYard(true);stSave();if(tbN===n)tbDraw()};
+  const tbDraw=()=>{const n=tbN;g('tbT').textContent='Transbordeur '+n;g('tbSeg').querySelectorAll('[data-tbs]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.tbs==='1')===tbOn(n))));
+    g('tbF').innerHTML=TBF[n].length?TBF[n].map(([k,l])=>`<label class="crow" style="justify-content:space-between">${l}<span class="crow"><input type="number" class="numin" data-tbk="${k}" min="1" max="900" value="${YP[k]}" style="width:76px"> s</span></label>`).join(''):'<p class="info" style="margin:0">Ce transbordeur se déplace avec la poussée : son trajet suit la cadence des voies 5 et 6.</p>';
+    if(n===2){const opt=[[1,Y.E[1],'voie 1 · chargement'],[1,Y.M[1],'voie 1 · vides'],[3,Y.E[3],'voie 3 · chargement'],[3,Y.M[3],'voie 3 · vides'],[2,Y.v2,'voie 2']].flatMap(([v,a,l])=>a.map(w=>`<option value="${w.uid}">${no3(w.no)} · ${l}${w.loaded?' (chargé)':' (vide)'}</option>`)).join('');
+      g('tbF').insertAdjacentHTML('beforeend',`<div style="border-top:1px solid var(--line);padding-top:8px"><span class="fl">Ordre manuel (sinon : alternance voie 1 / voie 3 vers la voie 4)</span><div class="crow" style="flex-wrap:wrap;margin-top:6px"><select id="t2W" class="numin">${opt||'<option value="">aucun wagon</option>'}</select><span>vers</span><select id="t2To" class="numin"><option value="v4">Voie 4</option><option value="v2">Voie 2</option><option value="v1">Voie 1 (chargement)</option><option value="v3">Voie 3 (chargement)</option></select><button class="btn pri" id="t2Go" type="button">Envoyer</button></div><p class="info" id="t2Ord" style="margin:6px 0 0">${Y.T2.order?'Ordre en attente : wagon '+no3((allW().find(x=>x.uid===Y.T2.order.uid)||{no:0}).no)+' → voie '+Y.T2.order.to[1]:''}</p></div>`);
+      g('t2Go').onclick=()=>{const u=Number(g('t2W').value);if(!u)return;Y.T2.order={uid:u,to:g('t2To').value};const w=allW().find(x=>x.uid===u);addLog('OP',w,`Ordre transbordeur 2 : aller chercher le wagon ${no3(w.no)} → voie ${Y.T2.order.to[1]}`,'Transbordeur 2','Poste');stSave();tbDraw()}}
+    g('tbI').textContent=tbOn(n)?'':'À l’arrêt : les wagons attendent qu’il soit remis en service.'};
+  const tbOpen=n=>{tbN=Number(n);tbDraw();g('tbmodal').hidden=false};g('tbX').onclick=g('tbOk').onclick=()=>{g('tbmodal').hidden=true;tbN=null};
+  g('tbSeg').addEventListener('click',e=>{const b=e.target.closest('[data-tbs]');if(b&&tbN&&(b.dataset.tbs==='1')!==tbOn(tbN))tbTog(tbN)});
+  g('tbF').addEventListener('change',e=>{const k=e.target.dataset.tbk;if(!k)return;YP[k]=Math.max(1,Math.min(900,Math.round(Number(e.target.value)||20)));e.target.value=YP[k];ysave();addLog('OP',null,`Transbordeur ${tbN} : ${TBF[tbN].find(x=>x[0]===k)[1]} en ${YP[k]} s`,`Transbordeur ${tbN}`,'Poste')});
+  g('ystat').addEventListener('click',ev=>{const st=ev.target.closest('[data-tbset]');if(st){tbOpen(st.dataset.tbset);return}const tb=ev.target.closest('[data-tb]');if(tb){tbTog(Number(tb.dataset.tb));return}const r=ev.target.closest('[data-tr]');if(r){trTog(r.dataset.tr);return}const t=ev.target.closest('[data-zone]');if(t)openZ(t.dataset.zone)});
   g('ystat').addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){const t=ev.target.closest('[data-zone]');if(t){ev.preventDefault();openZ(t.dataset.zone)}}});
   g('zSlots').addEventListener('click',ev=>{const b=ev.target.closest('[data-zi]');if(!b)return;let i=Number(b.dataset.zi);const a=zA(zEd.k);if(isQ(zEd.k)&&!a[i])i=a.length;zEd.sel=i;renderZ();g('zNo').focus()});
   g('zSw').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;zEd.col=b.dataset.c;g('zCol').value=zEd.col;g('zSw').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
@@ -1853,9 +1887,17 @@ function zInit(){
     addLog('OP',w,`Wagon retiré du circuit (position ${i+1})`,zN(k),'Poste');g('zMsg').textContent=`Wagon ${no3(w.no)} retiré du circuit.`;zEd.sel=null;renderZ();renderYard(true)});
   const zmsg=t=>{g('zMsg').textContent=t};
   g('zCapSeg').addEventListener('click',ev=>{const b=ev.target.closest('[data-cap]');if(!b)return;const n=Number(b.dataset.cap),c=Y.en.filter(Boolean).length;
-    if(n===YP.enMax)return;if(c>n)return zmsg(`${c} wagons sont dans l’engobage : retirez-en ou poussez avant de descendre à ${n}.`);
+    if(n===YP.enMax)return;if(c>n){g('zMsg').innerHTML=`${c} wagons dans l’engobage pour ${n} autorisé${n>1?'s':''} : <button class="btn" type="button" data-enfix="back" data-n="${n}">Reculer ${c-n} wagon${c-n>1?'s':''} vers le séchoir</button> <button class="btn" type="button" data-enfix="fwd" data-n="${n}">Avancer ${c-n} wagon${c-n>1?'s':''} vers le préfour</button>`;return}
     YP.enMax=n;fitTun('en');ysave();zEd.sel=null;addLog('OP',null,`Engobage : ${n} wagon${n>1?'s':''} maximum autorisé${n>1?'s':''}`,'Voie 5 engobage','Poste');zmsg(`Engobage réglé à ${n} wagon${n>1?'s':''} maximum.`);
     if(typeof buildCarto==='function')try{buildCarto()}catch(e){}renderZ();renderYard(true);stSave()});
+  g('zMsg').addEventListener('click',ev=>{const b=ev.target.closest('[data-enfix]');if(!b)return;const n=Number(b.dataset.n),a=Y.en;let k=a.filter(Boolean).length-n,done=0,why='';
+    if(b.dataset.enfix==='back'){while(k-->0){const i=a.findIndex(Boolean),w=a[i];if(!Y.se.includes(null)){const h=Y.se[0];if(h){if(Y.v4.length>=YP.v4Max){why='la voie 4 est pleine';break}Y.v4.unshift(h);addLog('OP',h,'Recul : entrée séchoir → tête de voie 4','Voie 4','Poste')}Y.se[0]=null}
+        const j=Y.se.indexOf(null);for(let x=j;x<Y.se.length-1;x++)Y.se[x]=Y.se[x+1];Y.se[Y.se.length-1]=w;a[i]=null;w.tz=0;addLog('OP',w,'Recul : engobage → sortie du séchoir','Voie 5 séchoir','Poste');done++}}
+    else{while(k-->0){let i=-1;for(let x=a.length-1;x>=0;x--)if(a[x]){i=x;break}const w=a[i];if(Y.t1w){if(!canAccept('pf')){why='la sortie du four est occupée';break}const t=Y.t1w;Y.t1w=null;insertInto('pf',t)}
+        if(!canAccept('pf')){why='la sortie du four est occupée';break}a[i]=null;w.tz=0;insertInto('pf',w);addLog('OP',w,'Avance : engobage → transbordeur 1 → préfour','Voie 6 préfour','Poste');done++}}
+    {const ws=a.filter(Boolean),m=a.length;for(let x=0;x<m;x++)a[x]=null;ws.forEach((w,x)=>{a[m-ws.length+x]=w})}
+    if(a.filter(Boolean).length<=n){YP.enMax=n;fitTun('en');ysave();addLog('OP',null,`Engobage : ${n} wagon${n>1?'s':''} maximum autorisé${n>1?'s':''}`,'Voie 5 engobage','Poste')}
+    zmsg(`${done} wagon${done>1?'s':''} ${b.dataset.enfix==='back'?'reculé(s) vers le séchoir':'avancé(s) vers le préfour'}${why?' — arrêt : '+why:''}. Engobage : ${a.filter(Boolean).length}/${YP.enMax}.`);try{buildCarto()}catch(e){}renderZ();renderYard(true);stSave()});
   g('zAdv').addEventListener('click',()=>{const a=Y[zEd.k];if(a[a.length-1])return zmsg('La dernière place (sortie) est occupée : utilisez « Pousser maintenant » pour faire sortir le wagon.');a.pop();a.unshift(null);if(zEd.sel!=null)zEd.sel=Math.min(a.length-1,zEd.sel+1);zmsg('Zone avancée d’une place.');addLog('OP',null,'Zone avancée d’une place',TNAME[zEd.k],'Poste');renderZ();renderYard(true)});
   g('zBack').addEventListener('click',()=>{const a=Y[zEd.k];if(a[0])return zmsg('La première place (entrée) est occupée : utilisez « Reculer d’un pas » pour reculer toute la chaîne.');a.shift();a.push(null);if(zEd.sel!=null)zEd.sel=Math.max(0,zEd.sel-1);zmsg('Zone reculée d’une place.');addLog('OP',null,'Zone reculée d’une place',TNAME[zEd.k],'Poste');renderZ();renderYard(true)});
   const moveSel=d=>{const a=zA(zEd.k),i=zEd.sel,j=i+d;if(i==null||!a[i]||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];zEd.sel=j;addLog('OP',a[j],`Wagon déplacé en position ${j+1}`,zN(zEd.k),'Poste');renderZ();renderYard(true)};
@@ -1908,7 +1950,7 @@ function snapY(){const ids=a=>a.map(w=>w?w.uid:null);
   return {v:1,at:Date.now(),t0:Y.t0,simT:Y.simT,wag:allW().map(w=>Object.assign({},w)),
     E:{1:ids(Y.E[1]),3:ids(Y.E[3])},M:{1:ids(Y.M[1]),3:ids(Y.M[3])},D:{1:ids(Y.D[1]),3:ids(Y.D[3])},v2:ids(Y.v2),v4:ids(Y.v4),v4b:ids(Y.v4b),fx:ids(Y.fx),t1w:Y.t1w?Y.t1w.uid:null,psIn:Y.psIn?Y.psIn.uid:null,tun:Object.fromEntries(TUN.map(k=>[k,ids(Y[k])])),
     T2:Object.assign({},Y.T2,{w:Y.T2.w?Y.T2.w.uid:null}),T3:Object.assign({},Y.T3,{w:Y.T3.w?Y.T3.w.uid:null}),
-    sc:{plan:Y.plan,trOff:Y.trOff,pt:Y.pt,ser:Y.ser,seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
+    sc:{tbOff:Y.tbOff,plan:Y.plan,trOff:Y.trOff,pt:Y.pt,ser:Y.ser,seqNext:Y.seqNext,no:Y.no,uid:Y.uid,exped:Y.exped,cadT:Y.cadT,catchLeft:Y.catchLeft,catchSec:Y.catchSec,bloc:Y.bloc},log:Y.log.slice(0,200)}}
 function stSave(){if(catching)return;try{localStorage.setItem(STKEY,JSON.stringify(snapY()));lastSave=Date.now()}catch(e){}}
 function stLoad(){let s;try{s=JSON.parse(localStorage.getItem(STKEY)||'null')}catch(e){return null}
   if(!s||s.v!==1||!Array.isArray(s.wag)||!s.wag.length)return null;
