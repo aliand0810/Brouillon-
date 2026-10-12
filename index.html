@@ -153,6 +153,27 @@ body.fsOn{overflow:hidden}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .tab .cnt{font:500 12px var(--f-mono);margin-left:6px;color:var(--muted)}
 .yard{display:flex;flex-direction:column;gap:12px}
+.tabs{position:sticky;top:0;z-index:30;background:var(--bg);overflow-x:auto;scrollbar-width:thin}.tabs .tab{white-space:nowrap;flex:none}
+.ytop{display:flex;flex-direction:column;gap:8px}.ytop .yquick{order:-1}
+.yquick{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px}
+.ymsg{margin:0;min-height:1.2em}
+.ygrid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:12px;align-items:start}
+.ymain{display:flex;flex-direction:column;gap:10px;min-width:0}
+.yside{display:flex;flex-direction:column;gap:10px;position:sticky;top:52px;max-height:calc(100vh - 64px);overflow:auto;padding-bottom:4px}
+.ysec>summary{cursor:pointer;padding:11px 14px;font:600 14px var(--f-disp);letter-spacing:.05em;text-transform:uppercase;list-style:none;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.ysec>summary::-webkit-details-marker{display:none}.ysec>summary::after{content:'▾';color:var(--muted)}.ysec[open]>summary::after{content:'▴'}
+.ysec[open]>summary{border-bottom:1px solid var(--line)}
+.secb{padding:12px 14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.secb .yc{flex:none!important}.secb .consigne{align-self:flex-start}
+.mapopt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:8px 12px}
+.chipt{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;padding:4px 9px;border:1px solid var(--line);border-radius:14px;cursor:pointer;background:var(--panel)}
+.mleg{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}.mleg i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-2px;border:1px solid #4A4F55}
+.hmi.nowl .yw .wn,.hmi.nolab .yw .lab,.hmi.nozl #ystat text{display:none}
+.ysum{gap:6px!important;padding:8px 12px!important}.ysum>span{background:var(--panel2);border-radius:6px;padding:5px 10px;white-space:nowrap}.ysum>span.alert,.ysum>span.okk{background:transparent}
+.lnpanel{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:flex-start;padding:12px 16px}
+.lnpanel .kv{display:flex;flex-direction:column;gap:4px;min-width:0}.lnpanel .kv b{font:600 18px var(--f-disp)}
+.phead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:2px 0 4px}.phead h2{margin:0;font:600 20px var(--f-disp);letter-spacing:.04em;text-transform:uppercase}
+@media (max-width:1100px){.ygrid{grid-template-columns:1fr}.yside{position:static;max-height:none}.ytop{grid-template-columns:1fr}}
 .ysum{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 16px}
 .ysum .alert{color:var(--bad);font-weight:600}
 .ysum .okk{color:var(--ok);font-weight:600}
@@ -313,25 +334,27 @@ img{max-width:100%}
     <button class="tab" role="tab" id="tab-plan" aria-controls="pagePlan" aria-selected="false" type="button">Planning</button>
   </div>
   <section class="yard" id="pagePlan" role="tabpanel" aria-labelledby="tab-plan" hidden>
+    <div class="phead"><h2>Planning de production</h2><span class="info" id="plSum"></span></div>
     <p class="info" style="margin:0 0 10px">Le planning dit à chaque ligne quoi produire : la référence (couches, pince), le nombre de wagons et leur couleur. L’ordre en cours est appliqué automatiquement à chaque wagon chargé ; quand il est terminé, l’ordre suivant démarre tout seul.</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap"><div class="card" style="padding:12px 14px;flex:1 1 380px;min-width:0"><h3 style="margin:0 0 8px;font-size:15px">Ligne A <span class="info" style="font-weight:400">· voie 3</span></h3>
         <div id="plCurA"></div>
         <h4 style="margin:12px 0 6px;font-size:13px">À suivre</h4><div id="plNextA"></div>
         <h4 style="margin:12px 0 6px;font-size:13px">Ajouter un ordre de production</h4>
-        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefA" class="numin" style="min-width:230px"></select></label>
+        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefA" class="numin" style="min-width:290px"></select></label>
           <label class="crow" style="font-size:12.5px">Wagons à produire <input type="number" id="plNA" min="1" max="500" value="10" class="numin" style="width:64px"></label></div>
         <div class="crow" style="flex-wrap:wrap;margin-top:6px"><span style="font-size:12.5px">Couleur</span><span id="plColA" style="display:inline-flex;gap:3px;flex-wrap:wrap"></span></div>
         <button class="btn pri" id="plAddA" type="button" style="margin-top:8px">Ajouter au planning</button></div><div class="card" style="padding:12px 14px;flex:1 1 380px;min-width:0"><h3 style="margin:0 0 8px;font-size:15px">Ligne B <span class="info" style="font-weight:400">· voie 1</span></h3>
         <div id="plCurB"></div>
         <h4 style="margin:12px 0 6px;font-size:13px">À suivre</h4><div id="plNextB"></div>
         <h4 style="margin:12px 0 6px;font-size:13px">Ajouter un ordre de production</h4>
-        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefB" class="numin" style="min-width:230px"></select></label>
+        <div class="crow" style="flex-wrap:wrap"><label class="crow" style="font-size:12.5px">Référence <select id="plRefB" class="numin" style="min-width:290px"></select></label>
           <label class="crow" style="font-size:12.5px">Wagons à produire <input type="number" id="plNB" min="1" max="500" value="10" class="numin" style="width:64px"></label></div>
         <div class="crow" style="flex-wrap:wrap;margin-top:6px"><span style="font-size:12.5px">Couleur</span><span id="plColB" style="display:inline-flex;gap:3px;flex-wrap:wrap"></span></div>
         <button class="btn pri" id="plAddB" type="button" style="margin-top:8px">Ajouter au planning</button></div></div>
     <p class="step" id="plMsg"></p>
   </section>
   <section class="yard" id="pageRef" role="tabpanel" aria-labelledby="tab-ref" hidden>
+    <div class="phead"><h2>Références de supports</h2><span class="info" id="rfSum"></span></div>
     <div class="card hmibar"><div class="yc" style="flex:1 1 100%"><span class="fl">Référence en production sur chaque ligne</span></div>
       <div class="yc"><span class="fl">Ligne A (voie 3)</span><select id="refSelA" class="numin" style="min-width:280px"></select><span class="info" id="refInfA"></span></div>
       <div class="yc"><span class="fl">Ligne B (voie 1)</span><select id="refSelB" class="numin" style="min-width:280px"></select><span class="info" id="refInfB"></span></div>
@@ -350,40 +373,26 @@ img{max-width:100%}
       <p class="info b" id="rfErr" style="flex:1 1 100%"></p></div>
   </section>
   <section class="yard" id="pageVoies" role="tabpanel" aria-labelledby="tab-voies" hidden>
-    <div class="card hmibar">
-      <div class="consigne"><span>Consigne temps<br>de poussée</span><input type="number" id="cadM" min="0" max="600" class="numin hn" aria-label="Minutes"><span>min</span><input type="number" id="cadS" min="0" max="59" class="numin hn" aria-label="Secondes"><span>sec</span></div>
-      <div class="yc" style="flex:1 1 220px"><p class="step" id="cadState"></p><div class="mbarT"><span id="cadBar"></span></div></div>
-      <div class="yc"><span class="fl">Poussée</span><div class="seg" role="group" aria-label="Poussée" id="cadOn"><button type="button" data-cad="1">Marche</button><button type="button" data-cad="0">Arrêt</button></div></div>
-      <div class="yc"><span class="fl">Ordre A / B (voie 4 → séchoir → four)</span><div class="seg" role="group" aria-label="Ordre d’entrée voie 4" id="v4Ord"><button type="button" data-o="A" style="white-space:nowrap">A B A B</button><button type="button" data-o="B" style="white-space:nowrap">B A B A</button></div>
-        <label class="crow" style="font-size:12px"><input type="checkbox" id="v4Strict"> Ordre strict (attendre la ligne attendue)</label><span class="info" id="seqInfo"></span></div>
-      <div class="yc"><span class="fl">Sortie four → déchargement</span><div class="seg" role="group" aria-label="Répartition au déchargement" id="depMode"><button type="button" data-dm="alt" style="white-space:nowrap">A / B alterné</button><button type="button" data-dm="line">Ligne d’origine</button><button type="button" data-dm="wagon">Selon le wagon</button></div></div>
-      <div class="yc"><span class="fl">Lignes de production</span><div class="seg" role="group" aria-label="Marche ou arrêt des lignes" id="lnStop"><button type="button" data-ls="A">Ligne A</button><button type="button" data-ls="B">Ligne B</button></div></div>
-      <div class="yc"><span class="fl">Transbordeurs</span><div class="seg" role="group" aria-label="Transbordeurs" id="manOn"><button type="button" data-m="1">Auto</button><button type="button" data-m="0">Arrêt</button></div></div>
-      <button class="btn" id="carto" type="button">Modifier la cartographie</button>
+    <div class="ytop">
+      <div class="card ysum" id="ysum"></div>
+      <div class="card yquick"><button class="btn pri" id="qPush" type="button">▶ Pousser maintenant</button>
       <button class="btn pri" id="fsBtn" type="button">⛶ Plein écran paysage</button>
-      <button class="btn" id="scanBtn" type="button">📷 Importer depuis une photo</button><button class="btn" id="refBtn" type="button">↺ Charger la photo du 12/10</button><button class="btn" id="photoBtn" type="button" hidden>🖼 Photo importée</button>
       <button class="btn" id="selBtn" type="button" aria-pressed="false">☑ Sélection multiple</button>
       <span class="crow"><label class="fl" for="findNo">Consulter le wagon n°</label><input type="number" id="findNo" min="1" max="999" class="numin" style="width:76px"><button class="btn" id="findGo" type="button">Afficher</button></span>
+      </div>
     </div>
-    <div class="card hmibar">
-      <div class="yc"><span class="fl">Ajustement manuel des wagons</span><span class="crow" style="flex-wrap:wrap">
-        <button class="btn pri" id="adjPush" type="button">Pousser maintenant</button>
-        <span class="crow"><button class="btn" id="adjFwd" type="button">Avancer de</button><input type="number" id="adjN" min="1" max="50" value="3" class="numin" style="width:60px" aria-label="Nombre de pas"><span>pas</span></span>
-        <button class="btn" id="adjBack" type="button">Reculer d’un pas</button></span></div>
-      <div class="yc"><span class="fl">Rattrapage du retard</span><span class="crow" style="flex-wrap:wrap">
-        <input type="number" id="rtN" min="1" max="100" value="5" class="numin" style="width:60px" aria-label="Nombre de poussées"><span>poussées à</span>
-        <input type="number" id="rtM" min="0" max="600" value="5" class="numin" style="width:60px" aria-label="Minutes"><span>min</span>
-        <input type="number" id="rtS" min="0" max="59" value="0" class="numin" style="width:60px" aria-label="Secondes"><span>s</span>
-        <button class="btn" id="rtGo" type="button">Lancer</button><button class="btn" id="rtStop" type="button">Annuler</button></span></div>
-      <div class="yc"><span class="fl">Déchargement</span><span class="crow" style="flex-wrap:wrap"><button class="btn" id="dAdv1" type="button">▶ Avancer voie 1</button><button class="btn" id="dAdv3" type="button">▶ Avancer voie 3</button></span></div>
-      <p class="step" id="adjMsg" style="flex:1 1 240px"></p>
-    </div>
-    <div class="card hmibar" id="serCard">
-      <div class="yc" style="flex:1 1 100%"><span class="fl">Cadence de production des lignes</span></div><div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptA" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne A"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne A" id="ptMA"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptB" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne B"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne B" id="ptMB"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSB"></span></div><div class="yc" style="flex:1 1 100%"><span class="fl">Séries de wagons : identifier une série par sa couleur</span></div>
-      <div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNA" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne A"><span>wagons · déjà faits</span><input type="number" id="serKA" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne A"><span class="sws" id="serCA" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoA" type="button">Lancer</button><button class="btn" id="serEndA" type="button">Terminer</button></span><span class="info" id="serSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNB" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne B"><span>wagons · déjà faits</span><input type="number" id="serKB" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne B"><span class="sws" id="serCB" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoB" type="button">Lancer</button><button class="btn" id="serEndB" type="button">Terminer</button></span><span class="info" id="serSB"></span></div>
-      <p class="step" id="serMsg" style="flex:1 1 100%"></p>
-    </div>
-    <div class="card ysum" id="ysum"></div>
+    <p class="step ymsg" id="adjMsg"></p>
+    <div class="ygrid">
+      <div class="ymain">
+        <div class="card mapopt" id="mapOpt">
+          <span class="crow"><span class="fl">Zoom</span><button class="btn" id="mzOut" type="button" aria-label="Réduire">−</button><span id="mzVal" class="info" style="min-width:44px;text-align:center">100 %</span><button class="btn" id="mzIn" type="button" aria-label="Agrandir">+</button><button class="btn" id="mzFit" type="button">Ajuster</button></span>
+          <span class="crow" style="flex-wrap:wrap"><span class="fl">Afficher</span>
+            <label class="chipt"><input type="checkbox" data-mo="wn" checked> Numéros</label>
+            <label class="chipt"><input type="checkbox" data-mo="lab" checked> Comptes à rebours</label>
+            <label class="chipt"><input type="checkbox" data-mo="zl" checked> Noms des zones</label>
+            <label class="chipt"><input type="checkbox" data-mo="leg"> Légende</label></span>
+          <div class="mleg" id="mapLeg" hidden></div>
+        </div>
     <div class="card hmi" id="hmiBox"><div class="fsin" id="fsIn"><div class="fsbar"><span id="fsInfo"></span><button class="btn" id="fsExit" type="button">✕ Quitter le plein écran</button></div>
       <div class="selbar" id="selBar" hidden>
         <strong id="selCount">Aucun wagon sélectionné</strong>
@@ -397,10 +406,51 @@ img{max-width:100%}
         <span class="info" id="selMsg"></span>
       </div><div class="scroll"><svg id="ysvg" viewBox="0 0 1160 590" role="img" aria-label="Cartographie des voies"><g id="ystat"></g><g id="ydyn"></g><g id="ywag"></g><g id="ydrag" pointer-events="none"></g></svg></div></div></div>
     <p class="hint">Cliquez sur un wagon pour consulter sa fiche (bouton « Modifier » dans la fiche). <strong>Maintenez un wagon appuyé</strong> (½ seconde) puis faites-le glisser jusqu’à la place choisie : il s’y pose, ou s’échange avec le wagon qui l’occupe. Cliquez sur une voie (1, 2, 3, 4, 6) ou sur une zone (pré-séchoir, séchoir, engobage, préfour, four) pour voir ses places, ajouter, modifier, déplacer ou retirer des wagons.</p>
-    <div class="card logw"><div class="scroll"><table class="log"><thead><tr><th>Date</th><th>Heure</th><th>Numéro</th><th>Désignation</th><th>Zone</th><th>Automate</th><th>Organe</th><th>Bloc programme</th><th>Armoire</th><th>Repère plan</th></tr></thead><tbody id="logb"></tbody></table></div></div>
+        <details class="card ysec" data-sec="log" open><summary>Journal des événements <span class="info" id="logCnt"></span></summary><div class="secb"><input id="logF" class="numin" placeholder="Filtrer : numéro de wagon, zone, mot…" style="max-width:340px" aria-label="Filtrer le journal"><div class="card logw"><div class="scroll"><table class="log"><thead><tr><th>Date</th><th>Heure</th><th>Numéro</th><th>Désignation</th><th>Zone</th><th>Automate</th><th>Organe</th><th>Bloc programme</th><th>Armoire</th><th>Repère plan</th></tr></thead><tbody id="logb"></tbody></table></div></div></div></details>
+      </div>
+      <aside class="yside" aria-label="Commandes des voies">
+        <details class="card ysec" data-sec="cad" open><summary>⏱ Poussée et ordre A/B</summary><div class="secb">
+      <div class="consigne"><span>Consigne temps<br>de poussée</span><input type="number" id="cadM" min="0" max="600" class="numin hn" aria-label="Minutes"><span>min</span><input type="number" id="cadS" min="0" max="59" class="numin hn" aria-label="Secondes"><span>sec</span></div>
+      <div class="yc" style="flex:1 1 220px"><p class="step" id="cadState"></p><div class="mbarT"><span id="cadBar"></span></div></div>
+      <div class="yc"><span class="fl">Poussée</span><div class="seg" role="group" aria-label="Poussée" id="cadOn"><button type="button" data-cad="1">Marche</button><button type="button" data-cad="0">Arrêt</button></div></div>
+      <div class="yc"><span class="fl">Ordre A / B (voie 4 → séchoir → four)</span><div class="seg" role="group" aria-label="Ordre d’entrée voie 4" id="v4Ord"><button type="button" data-o="A" style="white-space:nowrap">A B A B</button><button type="button" data-o="B" style="white-space:nowrap">B A B A</button></div>
+        <label class="crow" style="font-size:12px"><input type="checkbox" id="v4Strict"> Ordre strict (attendre la ligne attendue)</label><span class="info" id="seqInfo"></span></div>
+        </div></details>
+        <details class="card ysec" data-sec="man" open><summary>✋ Ajustement manuel</summary><div class="secb">
+      <div class="yc"><span class="fl">Ajustement manuel des wagons</span><span class="crow" style="flex-wrap:wrap">
+        <button class="btn pri" id="adjPush" type="button">Pousser maintenant</button>
+        <span class="crow"><button class="btn" id="adjFwd" type="button">Avancer de</button><input type="number" id="adjN" min="1" max="50" value="3" class="numin" style="width:60px" aria-label="Nombre de pas"><span>pas</span></span>
+        <button class="btn" id="adjBack" type="button">Reculer d’un pas</button></span></div>
+      <div class="yc"><span class="fl">Rattrapage du retard</span><span class="crow" style="flex-wrap:wrap">
+        <input type="number" id="rtN" min="1" max="100" value="5" class="numin" style="width:60px" aria-label="Nombre de poussées"><span>poussées à</span>
+        <input type="number" id="rtM" min="0" max="600" value="5" class="numin" style="width:60px" aria-label="Minutes"><span>min</span>
+        <input type="number" id="rtS" min="0" max="59" value="0" class="numin" style="width:60px" aria-label="Secondes"><span>s</span>
+        <button class="btn" id="rtGo" type="button">Lancer</button><button class="btn" id="rtStop" type="button">Annuler</button></span></div>
+        </div></details>
+        <details class="card ysec" data-sec="dech"><summary>⬇ Déchargement</summary><div class="secb">
+      <div class="yc"><span class="fl">Sortie four → déchargement</span><div class="seg" role="group" aria-label="Répartition au déchargement" id="depMode"><button type="button" data-dm="alt" style="white-space:nowrap">A / B alterné</button><button type="button" data-dm="line">Ligne d’origine</button><button type="button" data-dm="wagon">Selon le wagon</button></div></div>
+      <div class="yc"><span class="fl">Déchargement</span><span class="crow" style="flex-wrap:wrap"><button class="btn" id="dAdv1" type="button">▶ Avancer voie 1</button><button class="btn" id="dAdv3" type="button">▶ Avancer voie 3</button></span></div>
+        </div></details>
+        <details class="card ysec" data-sec="lines"><summary>🏭 Lignes et transbordeurs</summary><div class="secb">
+      <div class="yc"><span class="fl">Lignes de production</span><div class="seg" role="group" aria-label="Marche ou arrêt des lignes" id="lnStop"><button type="button" data-ls="A">Ligne A</button><button type="button" data-ls="B">Ligne B</button></div></div>
+      <div class="yc"><span class="fl">Transbordeurs</span><div class="seg" role="group" aria-label="Transbordeurs" id="manOn"><button type="button" data-m="1">Auto</button><button type="button" data-m="0">Arrêt</button></div></div>
+      <div class="yc" style="flex:1 1 100%"><span class="fl">Cadence de production des lignes</span></div><div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptA" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne A"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne A" id="ptMA"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><span>1 wagon toutes les</span><input type="number" id="ptB" min="1" max="600" class="numin" style="width:64px" aria-label="Minutes par wagon ligne B"><span>min</span><div class="seg" role="group" aria-label="Mode de production ligne B" id="ptMB"><button type="button" data-pm="1">Cadence fixe</button><button type="button" data-pm="0">Machines</button></div></span><span class="info" id="ptSB"></span></div>
+        </div></details>
+        <details class="card ysec" data-sec="ser" id="serCard"><summary>🎨 Séries de wagons</summary><div class="secb">
+      <div class="yc" style="flex:1 1 100%"><span class="fl">Séries de wagons : identifier une série par sa couleur</span></div>
+      <div class="yc"><span class="fl">Ligne A</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNA" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne A"><span>wagons · déjà faits</span><input type="number" id="serKA" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne A"><span class="sws" id="serCA" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoA" type="button">Lancer</button><button class="btn" id="serEndA" type="button">Terminer</button></span><span class="info" id="serSA"></span></div><div class="yc"><span class="fl">Ligne B</span><span class="crow" style="flex-wrap:wrap"><input type="number" id="serNB" min="1" max="200" value="10" class="numin" style="width:60px" aria-label="Nombre de wagons de la série ligne B"><span>wagons · déjà faits</span><input type="number" id="serKB" min="0" max="200" value="0" class="numin" style="width:56px" aria-label="Wagons déjà faits ligne B"><span class="sws" id="serCB" style="display:inline-flex;gap:3px"></span><button class="btn pri" id="serGoB" type="button">Lancer</button><button class="btn" id="serEndB" type="button">Terminer</button></span><span class="info" id="serSB"></span></div>
+      <p class="step" id="serMsg" style="flex:1 1 100%"></p>
+        </div></details>
+        <details class="card ysec" data-sec="tools"><summary>🗺 Cartographie et import</summary><div class="secb"><div class="crow" style="flex-wrap:wrap">
+      <button class="btn" id="carto" type="button">Modifier la cartographie</button>
+      <button class="btn" id="scanBtn" type="button">📷 Importer depuis une photo</button><button class="btn" id="refBtn" type="button">↺ Charger la photo du 12/10</button><button class="btn" id="photoBtn" type="button" hidden>🖼 Photo importée</button>
+        </div></div></details>
+      </aside>
+    </div>
   </section>
   <div class="layout" id="pageLigne" role="tabpanel" aria-labelledby="tab-ligne">
     <div class="main">
+      <div class="card lnpanel" id="lnPanel"></div>
       <nav class="mbar" id="mbar" aria-label="Réglages des machines"></nav>
       <p class="hint">Cliquez sur une machine, dans la barre ou directement sur le schéma, pour ouvrir sa fenêtre de réglages.</p>
       <div class="card stage">
@@ -420,12 +470,11 @@ img{max-width:100%}
 
       <div class="kpis" id="kpis"></div>
 
-      <div class="card chart">
-        <h2>Cadences théoriques</h2>
+      <details class="card chart ysec" data-sec="rates" open><summary>Cadences théoriques</summary><div>
         <p class="note">Supports par minute que chaque poste peut traiter seul avec les réglages actuels. Le plus lent (en orange) fixe la cadence de la ligne. Le trait bleu indique la cadence mesurée en sortie wagon.</p>
         <div class="rates" id="rates"></div>
         <div class="meas-l" id="measl"></div>
-      </div>
+      </div></details>
     </div>
 
   </div>
@@ -1341,7 +1390,7 @@ function wagPos(){
 }
 const wagSvg=(w,x,y,zc,lab)=>{const stp=!!lab&&lab[0]==='\u0001';if(stp)lab=lab.slice(1);return `<g class="yw" data-uid="${w.uid}" transform="translate(${x.toFixed(1)},${y})" tabindex="0" role="button" aria-label="Wagon ${no3(w.no)}" aria-pressed="${SEL.has(w.uid)}">${SEL.has(w.uid)?'<rect x="-12.5" y="-22" width="25" height="44" rx="3" fill="#FFD54A" fill-opacity=".55" stroke="#C77C00" stroke-width="2.5"/>':''}<title>Wagon ${no3(w.no)} · ${w.loaded?'chargé ligne '+w.line:'vide'}${w.pre?' · pré-séchoir':''} · retour voie ${w.ret}</title>
   <rect class="body" x="-9.5" y="-19" width="19" height="38" fill="${ZC[zc]}" stroke="#4A4F55" stroke-width=".8"/>${w.loaded?`<rect x="-5.5" y="-15" width="11" height="11" fill="${w.color}" stroke="#1A1A1A" stroke-width=".6"/>`:`<rect x="-5.5" y="-15" width="11" height="11" fill="none" stroke="#6A6F75" stroke-dasharray="2 1.5" stroke-width=".8"/>`}
-  ${w.pre?`<circle cx="6.5" cy="-16" r="2.4" fill="#FFF" stroke="#1A1A1A" stroke-width=".6"/>`:''}<text y="13" text-anchor="middle" style="font-size:7.5px;font-family:var(--f-mono)">${no3(w.no)}</text>${lab?`<rect x="${-Math.max(12,String(lab).length*2.25+2)}" y="21.5" width="${Math.max(24,String(lab).length*4.5+4)}" height="10" rx="2" fill="${stp?'#C62828':'#FFFFFF'}" stroke="${stp?'#7F1010':'#8E9296'}" stroke-width=".6"/><text y="29.3" text-anchor="middle" style="font-size:7.2px;font-weight:700;font-family:var(--f-mono);fill:${stp?'#FFFFFF':'#1F2226'}">${lab}</text>`:''}${stp?`<g transform="translate(0,-27)"><rect x="-13" y="-5" width="26" height="10" rx="2" fill="#C62828"/><text y="2.6" text-anchor="middle" style="font-size:7px;font-weight:700;font-family:var(--f-mono);fill:#FFF">ARRÊT</text></g>`:''}</g>`};
+  ${w.pre?`<circle cx="6.5" cy="-16" r="2.4" fill="#FFF" stroke="#1A1A1A" stroke-width=".6"/>`:''}<text class="wn" y="13" text-anchor="middle" style="font-size:7.5px;font-family:var(--f-mono)">${no3(w.no)}</text>${lab?`<g class="lab"><rect x="${-Math.max(12,String(lab).length*2.25+2)}" y="21.5" width="${Math.max(24,String(lab).length*4.5+4)}" height="10" rx="2" fill="${stp?'#C62828':'#FFFFFF'}" stroke="${stp?'#7F1010':'#8E9296'}" stroke-width=".6"/><text y="29.3" text-anchor="middle" style="font-size:7.2px;font-weight:700;font-family:var(--f-mono);fill:${stp?'#FFFFFF':'#1F2226'}">${lab}</text></g>`:''}${stp?`<g transform="translate(0,-27)"><rect x="-13" y="-5" width="26" height="10" rx="2" fill="#C62828"/><text y="2.6" text-anchor="middle" style="font-size:7px;font-weight:700;font-family:var(--f-mono);fill:#FFF">ARRÊT</text></g>`:''}</g>`};
 function drawDyn(){
   const s=[],f=Y.flash;
   let y4=VY[5],y1=VY[6],y3a=null;
@@ -1432,7 +1481,7 @@ function yardInit(){
   g('wmodal').addEventListener('click',ev=>{if(ev.target.id==='wmodal')closeW()});
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&wEdit)closeW()});
   g('wNo').addEventListener('keydown',ev=>{if(ev.key==='Enter')g('wOk').click()});
-  ['A','B','voies','ref','plan'].forEach(t=>g('tab-'+t).addEventListener('click',()=>switchTo(t)));refInit();planInit();
+  ['A','B','voies','ref','plan'].forEach(t=>g('tab-'+t).addEventListener('click',()=>switchTo(t)));refInit();planInit();uiInit();lnPanelInit();
   const hs=location.hash.slice(1);if(['voies','B','ref','plan'].includes(hs))switchTo(hs);
 }
 /* --- éditeur de zone : tunnels (pré-séchoir, séchoir, engobage, préfour, four) et voies (1, 2, 3, 4, 6) --- */
@@ -1769,7 +1818,7 @@ function renderProd(){const g=id=>document.getElementById(id),w=allW().find(x=>x
   const rows=grp.map((x,k)=>{ts+=x.sup||0;const m=x.tDep||YP.tDep;tm+=m;return `<tr><td>${k+1}</td><td><span class="wsw" style="display:inline-block;vertical-align:middle;background:${x.color}"></span> <b>${no3(x.no)}</b></td><td>${whereW(x)}</td><td>${lay}</td><td>${fmt(x.sup||0,0)}</td><td>${m} min</td></tr>`}).join('');
   g('pTab').innerHTML=`<thead><tr><th>#</th><th>Wagon</th><th>Emplacement</th><th>Couches</th><th>Supports</th><th>Déchargement</th></tr></thead><tbody>${rows}<tr style="font-weight:700"><td></td><td>Total ${grp.length} wagons</td><td></td><td>${lay*grp.length}</td><td>${fmt(ts,0)}</td><td>${hmS(tm*60)}</td></tr></tbody>`;
   g('pMsg').textContent=grp.length<n?`Seulement ${grp.length} wagon(s) de la ligne ${w.line} trouvés avant celui-ci dans le circuit.`:`Wagon ${no3(w.no)} et les ${grp.length-1} wagons chargés avant lui sur la ligne ${w.line}.`}
-function renderRefs(){const g=id=>document.getElementById(id);
+function renderRefs(){const g=id=>document.getElementById(id);{const e=g('rfSum');if(e)e.textContent=`${RF.refs.length} référence${RF.refs.length>1?'s':''} · ligne A : ${RF.ln.A||'aucune'} · ligne B : ${RF.ln.B||'aucune'}`}
   ['A','B'].forEach(L=>{const sel=g('refSel'+L);sel.innerHTML=`<option value="">Aucune (réglages de la ligne)</option>`+RF.refs.map(r=>`<option value="${r.code}"${RF.ln[L]===r.code?' selected':''}>${r.code} · ${r.h} couches, ${r.l} par ${r.l}</option>`).join('');
     const r=refOf(L);g('refInf'+L).textContent=r?`la pince pose ${r.l} couches à la fois, ${r.h/r.l} prise${r.h/r.l>1?'s':''} par pile · ${r.c*r.h*8} supports par wagon`:''});
   g('refTab').innerHTML='<thead><tr><th>Référence</th><th>Couches sur le wagon</th><th>Couches par prise</th><th>Colonnes</th><th>Supports / wagon</th><th>Couleur</th><th>Ligne</th><th></th></tr></thead><tbody>'+
@@ -1786,7 +1835,7 @@ function refInit(){const g=id=>document.getElementById(id),msg=t=>{g('refMsg').t
     if(!(h>=1&&l>=1&&c>=1))return err('Les couches et les colonnes doivent être au moins 1.');if(h%l)return err(`${h} couches ne se posent pas ${l} par ${l} : le nombre de couches doit être un multiple du nombre par prise.`);
     RF.refs.push({code,h,l,c,col:g('rfCol').value});rfSave();err('');g('rfCode').value='';msg(`Référence ${code} ajoutée : ${h} couches posées ${l} par ${l}. Choisissez-la pour une ligne ci-dessus.`);renderRefs()});
   ['A','B'].forEach(L=>applyRef(L,false));renderRefs()}
-function renderPlan(force){const g=id=>document.getElementById(id);if(!force&&g('pagePlan').hidden)return;
+function renderPlan(force){const g=id=>document.getElementById(id);if(!force&&g('pagePlan').hidden)return;{const e=g('plSum'),t=L=>Y.plan[L].reduce((a,o)=>a+o.n-o.done,0);if(e)e.textContent=`reste à produire : ligne A ${t('A')} wagon${t('A')>1?'s':''} · ligne B ${t('B')} wagon${t('B')>1?'s':''}`}
   ['A','B'].forEach(L=>{const q=Y.plan[L],o=q[0],ref=c=>refByCode(c),rd=c=>{const r=ref(c);return r?`${r.code} · ${r.h} couches posées ${r.l} par ${r.l}`:c};
     const step=YP['ptOn'+L]?Math.max(YP['pt'+L]*60,2*cadSec()):2*cadSec();let acc=0;
     if(!o)g('plCur'+L).innerHTML=`<p class="info" style="margin:0">Aucun ordre en cours : la ligne produit selon la référence du wagon ou de la ligne.</p>`;
@@ -1806,6 +1855,34 @@ function planInit(){const g=id=>document.getElementById(id),col={A:'#2B4FA8',B:'
     else if(b.dataset.pa==='del')q.splice(i,1);else if(b.dataset.pa==='up'&&i>1)[q[i-1],q[i]]=[q[i],q[i-1]];
     renderPlan(true);stSave()});
   setInterval(()=>renderPlan(false),1000)}
+/* ---------- présentation : sections repliables, options de carte, journal filtrable, pilotage de ligne ---------- */
+function uiInit(){const g=id=>document.getElementById(id);let st={};try{st=JSON.parse(localStorage.getItem('ligne-ui-v1')||'{}')}catch(e){}const sv=()=>{try{localStorage.setItem('ligne-ui-v1',JSON.stringify(st))}catch(e){}};
+  document.querySelectorAll('details.ysec[data-sec]').forEach(d=>{const k=d.dataset.sec;if(st.sec&&k in st.sec)d.open=!!st.sec[k];d.addEventListener('toggle',()=>{st.sec=st.sec||{};st.sec[k]=d.open;sv()})});
+  g('qPush').addEventListener('click',()=>g('adjPush').click());
+  // zoom
+  let z=st.z||1;const svg=g('ysvg'),box=g('hmiBox'),ap=()=>{svg.style.width=(z*100)+'%';svg.style.minWidth=(z*100)+'%';g('mzVal').textContent=Math.round(z*100)+' %';st.z=z;sv()};
+  g('mzIn').onclick=()=>{z=Math.min(3,+(z+.25).toFixed(2));ap()};g('mzOut').onclick=()=>{z=Math.max(1,+(z-.25).toFixed(2));ap()};g('mzFit').onclick=()=>{z=1;ap()};ap();
+  // options d'affichage
+  const cls={wn:'nowl',lab:'nolab',zl:'nozl'};st.mo=st.mo||{};
+  document.querySelectorAll('[data-mo]').forEach(c=>{const k=c.dataset.mo;if(k in st.mo)c.checked=st.mo[k];const apply=()=>{if(cls[k])box.classList.toggle(cls[k],!c.checked);if(k==='leg')g('mapLeg').hidden=!c.checked;st.mo[k]=c.checked;sv()};c.addEventListener('change',apply);apply()});
+  g('mapLeg').innerHTML=[[YP.colA,'chargé ligne A'],[YP.colB,'chargé ligne B'],['transparent','wagon vide'],['#FFFFFF','● pré-séchoir (point blanc)'],['#C62828','arrêt (trainard, transbordeur, déchargement)'],['var(--hmi-tr)','trainard en mouvement']].map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join('');
+  // journal filtrable
+  const lf=g('logF');let lq=st.lq||'';lf.value=lq;const filt=()=>{lq=lf.value.trim().toLowerCase();st.lq=lq;sv();let n=0,t=0;g('logb').querySelectorAll('tr').forEach(r=>{t++;const ok=!lq||r.textContent.toLowerCase().includes(lq);r.style.display=ok?'':'none';if(ok)n++});g('logCnt').textContent=lq?`${n} / ${t}`:`${t} lignes`};
+  lf.addEventListener('input',filt);new MutationObserver(filt).observe(g('logb'),{childList:true});filt();
+  setInterval(lnPanel,1000);lnPanel()}
+function lnPanel(){const g=id=>document.getElementById(id),el=g('lnPanel');if(!el||g('pageLigne').hidden)return;const L=ACT.id,v=L==='A'?YP.exA:YP.exB,stp=!!YP['stop'+L],o=planCur(L),{w,r}=wagRef(L),lw=lineWagons(L);
+  const sig=[L,stp,o&&o.id,o&&o.done,r&&r.code,w&&w.uid,YP['ptOn'+L],RF.ln[L],RF.refs.length,lw.done[0]&&lw.done[0].uid].join('|');if(el.dataset.sig===sig){const c=g('lnCd');if(c)c.textContent=YP['ptOn'+L]?cd(Math.max(1,YP['pt'+L])*60-(Y.pt[L]||0)):'';return}el.dataset.sig=sig;
+  el.innerHTML=`<div class="kv"><span class="fl">Ligne ${L} · voie ${v}</span><span class="seg" role="group" aria-label="Marche ou arrêt"><button type="button" data-lp="run" aria-pressed="${!stp}">● Marche</button><button type="button" data-lp="stop" aria-pressed="${stp}">■ Arrêt</button></span></div>
+    <div class="kv"><span class="fl">Wagon en chargement</span><b>${w?no3(w.no):'—'}</b><span class="info">précédent ${lw.done[0]?no3(lw.done[0].no):'—'} · suivant ${lw.up[1]?no3(lw.up[1].no):'—'}</span></div>
+    <div class="kv"><span class="fl">Référence préparée</span><b>${r?r.code:'—'}</b><span class="info">${r?`${r.h} couches posées ${r.l} par ${r.l}`:'réglages manuels'}</span></div>
+    <div class="kv"><span class="fl">Planning</span>${o?`<b><span class="wsw" style="display:inline-block;vertical-align:middle;background:${o.color}"></span> ${o.done}/${o.n}</b><span class="info">ordre ${o.ref} · ${Y.plan[L].length-1} à suivre</span>`:'<span class="info">aucun ordre</span>'}<button class="btn" type="button" data-lp="plan">Ouvrir le planning</button></div>
+    <div class="kv"><span class="fl">Référence de la ligne</span><select class="numin" data-lp="ref"><option value="">Aucune</option>${RF.refs.map(x=>`<option value="${x.code}"${RF.ln[L]===x.code?' selected':''}>${x.code} · ${x.h} c. ${x.l}×</option>`).join('')}</select></div>
+    <div class="kv"><span class="fl">Production</span><span class="seg" role="group" aria-label="Mode"><button type="button" data-lp="pt1" aria-pressed="${!!YP['ptOn'+L]}">Cadence ${YP['pt'+L]} min</button><button type="button" data-lp="pt0" aria-pressed="${!YP['ptOn'+L]}">Machines</button></span><span class="info" id="lnCd"></span></div>`}
+function lnPanelInit(){const g=id=>document.getElementById(id);g('lnPanel').addEventListener('click',e=>{const b=e.target.closest('[data-lp]');if(!b||b.tagName==='SELECT')return;const L=ACT.id,a=b.dataset.lp;
+    if(a==='run'||a==='stop'){const st=a==='stop'?1:0;if(YP['stop'+L]!==st){YP['stop'+L]=st;ysave();addLog('OP',null,`Ligne ${L} ${st?'mise à l’arrêt':'remise en marche'}`,`Ligne ${L}`,'Poste');stSave()}}
+    else if(a==='plan')switchTo('plan');else if(a==='pt1'||a==='pt0'){const on=a==='pt1'?1:0;if(YP['ptOn'+L]!==on){YP['ptOn'+L]=on;Y.pt[L]=0;ysave();addLog('OP',null,on?`Ligne ${L} : cadence fixe, 1 wagon toutes les ${YP['pt'+L]} min`:`Ligne ${L} : production par les machines`,`Ligne ${L}`,'Poste');stSave()}}
+    g('lnPanel').dataset.sig='';lnPanel()});
+  g('lnPanel').addEventListener('change',e=>{const s=e.target.closest('[data-lp="ref"]');if(!s)return;const L=ACT.id;RF.ln[L]=s.value;rfSave();applyRef(L);addLog('OP',null,`Ligne ${L} : référence ${s.value||'aucune'}`,`Ligne ${L}`,'Poste');g('lnPanel').dataset.sig='';lnPanel()})}
 function infoInit(){
   const g=id=>document.getElementById(id);
   g('iX').addEventListener('click',closeI);g('iOk').addEventListener('click',closeI);g('imodal').addEventListener('click',ev=>{if(ev.target.id==='imodal')closeI()});
