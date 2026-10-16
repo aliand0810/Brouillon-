@@ -443,7 +443,7 @@ img{max-width:100%}
         </div></details>
         <details class="card ysec" data-sec="tools"><summary>🗺 Cartographie et import</summary><div class="secb"><div class="crow" style="flex-wrap:wrap">
       <button class="btn" id="carto" type="button">Modifier la cartographie</button>
-      <button class="btn" id="scanBtn" type="button">📷 Importer depuis une photo</button><button class="btn" id="refBtn" type="button">↺ Charger la photo du 13/10</button><button class="btn" id="photoBtn" type="button" hidden>🖼 Photo importée</button>
+      <button class="btn" id="scanBtn" type="button">📷 Importer depuis une photo</button><button class="btn" id="refBtn" type="button">↺ Charger la photo du 16/10</button><button class="btn" id="photoBtn" type="button" hidden>🖼 Photo importée</button>
         </div></div></details>
       </aside>
     </div>
@@ -1550,13 +1550,13 @@ function adjInit(){
 /* --- import de la cartographie depuis une photo (ou saisie) --- */
 const SZ=[['ch1','Voie 1 · chargement'],['m1','Voie 1 · vides en attente'],['de1','Voie 1 · déchargement'],['ch3','Voie 3 · chargement'],['m3','Voie 3 · vides en attente'],['de3','Voie 3 · déchargement'],['v2','Voie 2'],['v4','Voie 4 (stockage)'],['v4b','Voie 4b (attente transbordeur 3)'],
   ['ps','Pré-séchoir (voie 5b)'],['se','Séchoir (zones 11 à 1)'],['t2','Transbordeur 2 (wagon porté)'],['t1','Transbordeur 1 (wagon porté)'],['en','Engobage'],['pf','Préfour'],['sa','Sas (entre préfour et four)'],['fo','Four'],['fx','Voie 6, après le four']];
-const SCOL={b:'#2B4FA8',r:'#C8372D',j:'#E8C72E',m:'#151A4A'};
+const SCOL={b:'#2B4FA8',r:'#C8372D',j:'#E8C72E',m:'#151A4A',g:'#6CC24A'};
 const colLetter=c=>{c=(c||'').toLowerCase();for(const k in SCOL)if(SCOL[k].toLowerCase()===c)return k;return ''};
 let scanFileBlob=null,scanCtl=null,sampleFn=null;
-const PHOTO_REF={ch1:'092v 046v',de1:'088b 008b',t2:'051r',ch3:'035r 026v 075v',de3:'032r',v2:'028m',v4:'081b 057r 017b 098r 079b 060r 014b 083r 037b 009r 024b 040r 080b 053r 094r 078r',ps:'003j 022j 031j 070j',se:'011b 068r 006b 020r 029b 010r 091b 007r 054b 016r 019b 023r 039b 036r 025b 082r 049r 034r 033r 004r 018r 085r 005r 095r 047r 015r',t1:'',en:'067r 013b 063r',pf:'077b 096r 044b 097r 052b 084j 076b',sa:'056j',fo:'066b 043j 061b 074j 064r 087j 090r 041j 099r 055j 089r 021j 002r 093j 027r 045j 001r 071j 073r 012j 062r 065j 069r 072j 058r 042b 038r 048b 050r 086b 059r 030b',fx:''}; // photo du 13/10
-const PHOTO_REF_ID='2026-10-13';
+const PHOTO_REF={ch1:'024b 037b 079v 017v',de1:'081g 092g 046g',t2:'',ch3:'009v 083v',de3:'060b 098b 057b 051b 035b',v2:'028m',v4:'040r 080b 053r 094b 078r 015j 047r 095j 005r 085j',ps:'003j 022j 031j 070j',se:'096b 077b 067b 013b 063b 011b 068b 006b 020b 029b 010b 091b 007b 054b 016j 019r 023j 039r 036j 025r 082j 049r 034j 033r 004j 018r',t1:'',en:'052b 097b 044b',pf:'084b 076b 056b 066b 043b 061b 074b',sa:'064b',fo:'087b 090b 041b 099b 055b 089b 021b 002b 093b 027b 045b 001b 071b 073b 012b 062b 065b 069b 072b 058b 042b 038b 048b 050b 086b 059b 030g 032b 008g 075b 088g 026b',fx:''}; // photo du 16/10
+const PHOTO_REF_ID='2026-10-16';
 function loadPhotoRef(){SZ.forEach(([k])=>{document.getElementById('sz-'+k).value=PHOTO_REF[k]||''});renderChips()}
-const CCYC=['b','r','j','m','v',''];
+const CCYC=['b','r','j','m','g','v',''];
 // positions lues sur la photo → places de la zone (les places vides entre deux wagons sont gardées)
 function zoneCap(k){return {ps:YP.psMax,se:YP.seMax,en:YP.enMax,pf:YP.pfMax,sa:YP.saMax,fo:YP.foMax}[k]}
 function placeTokens(k,a){const it=a.map((x,i)=>typeof x==='string'?{n:x,p:null,i}:{n:String(x&&x.n||''),p:x&&typeof x.p==='number'?Math.max(0,Math.min(1,x.p)):null,i}).filter(x=>/\d/.test(x.n));
@@ -1659,7 +1659,7 @@ Group the wagons by zone. For EVERY wagon also give "p": its horizontal position
 - A wagon standing on "Transbordeur 4" (grey band between the Séchoir and the Pré-séchoir) belongs to "se" as its LAST (rightmost) wagon.
 - fx: any wagon on Voie 6 right of the Four, or on "Transbordeur 3" (far right band).
 The colour letter is the colour of the small SQUARE on top of the tile, not the tile background. Exception: a tile with a WHITE background is an empty wagon: write it with the letter v whatever its square colour.
-Write each wagon as {"n": its 3-digit number followed by one colour letter (b=blue, r=red, j=yellow, m=dark navy, v=empty/no square), "p": position 0..1}. Example {"n":"091b","p":0.42}.
+Write each wagon as {"n": its 3-digit number followed by one colour letter (b=blue or purple, r=red, j=yellow, m=dark navy, g=green, v=empty/no square), "p": position 0..1}. Example {"n":"091b","p":0.42}.
 Reply with only JSON: {"ch1":[{"n":"010m","p":0.1}],"m1":[],"de1":[],"ch3":[],"m3":[],"de3":[],"v2":[],"v4":[],"v4b":[],"t2":[],"t1":[],"ps":[],"se":[],"en":[],"pf":[],"sa":[],"fo":[],"fx":[]}. Use [] for empty zones. Never invent numbers you cannot read; skip unreadable tiles.`;
     try{const r=await sampleFn.json(prompt,{images:[scanFileBlob],modelTier:'complex',signal:scanCtl.signal});
       let n=0;SZ.forEach(([k])=>{const a=Array.isArray(r&&r[k])?r[k]:[];n+=a.length;g('sz-'+k).value=placeTokens(k,a)});renderChips();
@@ -2066,7 +2066,7 @@ let stAt=stLoad();
 let refNew=false;try{refNew=localStorage.getItem('ligne-photo-ref-id')!==PHOTO_REF_ID}catch(e){}
 if(stAt&&refNew)stAt=null; // nouvelle photo de référence : elle remplace la carte sauvegardée (une seule fois)
 try{localStorage.setItem('ligne-photo-ref-id',PHOTO_REF_ID)}catch(e){}
-if(!stAt){try{loadPhotoRef();applyScan(true);Y.log.length=0;addLog('OP',null,'Cartographie de départ : photo de référence du 13/10 (99 wagons)','Toutes les voies','Poste');Y.cadT=0}catch(e){}}
+if(!stAt){try{loadPhotoRef();applyScan(true);Y.log.length=0;addLog('OP',null,'Cartographie de départ : photo de référence du 16/10 (98 wagons)','Toutes les voies','Poste');Y.cadT=0}catch(e){}}
 renderYard(true);buildPanel();teachInit();updTeach();t3Init();updT3();buildRates();syncSpeed();updateKpi();updateMeas();updateChips(render());
 let last=performance.now(),acc=0;
 if(stAt){const gap=(Date.now()-stAt)/1000;if(gap>5)catchUp(gap,'Reprise après absence');else{Y.t0+=Date.now()-simDate().getTime();stSave()}}else stSave();
